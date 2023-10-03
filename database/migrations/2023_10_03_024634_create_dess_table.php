@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('id_card');
             $table->string('document');
             $table->string('video');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->constrained();
             $table->timestamps();
         });
     }
