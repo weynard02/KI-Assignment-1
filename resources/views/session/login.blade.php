@@ -15,20 +15,22 @@
                     <p class="text-center display-5 fw-bold">Login</p>
                 </div>
             </div>
-            <!-- Email input -->
-            <div class="form-outline mb-4">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" placeholder="Username" />
-            </div>
+            <form action="/login" method="post" enctype="multipart/form-data">
+                @csrf
+                <div class="form-outline mb-4">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" placeholder="Username" name="username" />
+                </div>
 
-            <!-- Password input -->
-            <div class="form-outline mb-4">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" placeholder="Password" />
-            </div>
-            <!-- Submit button -->
-            <button type="submit" class="btn btn-dark align-items-center w-100 d-flex flex-column mb-4" style="background-color: #202020">LOGIN</button>
-            
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" placeholder="Password" name="password" />
+                </div>
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-dark align-items-center w-100 d-flex flex-column mb-4" style="background-color: #202020">LOGIN</button>
+            </form>
+
             <div class="d-flex align-items-center justify-content-center pb-4">
                 <p class="mb-0 me-2">Don't have an account?</p>
                 <a href="/register" class="btn btn-outline-dark">Create new</a>

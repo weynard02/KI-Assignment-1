@@ -10,7 +10,7 @@ class Rc4 extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fullname', 'id_card', 'document', 'video'];
+    protected $fillable = ['fullname', 'id_card', 'document', 'video', 'user_id'];
 
     public function user(): BelongsTo 
     {
