@@ -17,8 +17,8 @@
             </div>
             <!-- Email input -->
             <div class="form-outline mb-4">
-                <label class="form-label">Email address</label>
-                <input type="email" class="form-control" placeholder="Email Address" />
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" placeholder="Username" />
             </div>
 
             <!-- Password input -->
