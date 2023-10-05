@@ -1,5 +1,4 @@
-@extends('layout/aplication')
-
+@extends('master')
 @section('content')
 <div class="container d-flex justify-content-center align-items-center min-vh-100" style="background-color: #d1e5e6">
     <div class="row mb-4 border rounded-5 p-3 bg-white shadow box-area">
