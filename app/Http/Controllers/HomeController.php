@@ -13,19 +13,19 @@ class HomeController extends Controller
 {
     public function index()
     {
-        if (!Auth::user()) return redirect('/login');
+        // if (!Auth::user()) return redirect('/login');
         return view('home.index');
     }
 
     public function create()
     {
-        if (!Auth::user()) return redirect('/login');
+        // if (!Auth::user()) return redirect('/login');
         return view('home.create');
     }
 
     public function store(Request $request)
     {
-        if (!Auth::user()) return redirect('/login');
+        // if (!Auth::user()) return redirect('/login');
         $request->validate(
             [
                 'fullname' => 'required',
