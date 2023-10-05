@@ -27,7 +27,7 @@ class UserController extends Controller
             'password' => $request->password,
         ];
 
-        if (Auth::attempt($data)) return redirect('home');
+        if (Auth::attempt($data)) return redirect('/home');
         else return view('session.login');
     }
 
@@ -61,7 +61,7 @@ class UserController extends Controller
 
         User::create($data);
 
-        if (Auth::attempt($data)) return redirect('home');
+        if (Auth::attempt($data)) return redirect('/home');
         else return view('session.login');
     }
 }
