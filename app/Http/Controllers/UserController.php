@@ -28,7 +28,7 @@ class UserController extends Controller
         ];
 
         if (Auth::attempt($data)) return redirect('home');
-        else return redirect('session.login');
+        else return view('session.login');
     }
 
     public function logout()
@@ -62,6 +62,6 @@ class UserController extends Controller
         User::create($data);
 
         if (Auth::attempt($data)) return redirect('home');
-        else return redirect('session.login');
+        else return view('session.login');
     }
 }
