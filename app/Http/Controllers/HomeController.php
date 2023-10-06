@@ -15,8 +15,9 @@ class HomeController extends Controller
     public function index()
     {
         // if (!Auth::user()) return redirect('/login');
+        $des = Des::where('user_id', Auth::id())->get();
         $rc4s = Rc4::where('user_id', Auth::id())->get();
-        return view('home.index', compact('rc4s'));
+        return view('home.index', compact('des', 'rc4s'));
     }
 
     public function create()
@@ -46,6 +47,9 @@ class HomeController extends Controller
             ]
         );
 
+        $key_des = random_bytes(7);
+        $iv_des = random_bytes(8);
+        $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
         $fullname_rc4 = $this->Rc4encrypt($request->fullname, date('ymdhis'), 0);
 
         $id_card_file = $request->file('id_card');
@@ -54,6 +58,7 @@ class HomeController extends Controller
         $id_card_file->storeAs('public/id-card/aes', $id_card_new);
         $id_card_file->storeAs('public/id-card/des', $id_card_new);
         $id_card_file->storeAs('public/id-card/rc4', $id_card_new);
+        $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), date('ymdhis'), 1);
 
         $document_file = $request->file('document');
@@ -62,6 +67,7 @@ class HomeController extends Controller
         $document_file->storeAs('public/document/aes', $document_new);
         $document_file->storeAs('public/document/des', $document_new);
         $document_file->storeAs('public/document/rc4', $document_new);
+        $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), date('ymdhis'), 1);
 
         $video_file = $request->file('video');
@@ -70,6 +76,7 @@ class HomeController extends Controller
         $video_file->storeAs('public/video/aes', $video_new);
         $video_file->storeAs('public/video/des', $video_new);
         $video_file->storeAs('public/video/rc4', $video_new);
+        $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), date('ymdhis'), 1);
 
         Aes::create([
@@ -82,12 +89,13 @@ class HomeController extends Controller
         ]);
         
         Des::create([
-            'fullname' => $request->fullname,
+            'fullname' => $fullname_des,
             'id_card' => $id_card_new,
             'document' => $document_new,
             'video' => $video_new,
             'user_id' => Auth::user()->id,
-            'key' => date('ymdhis')
+            'key' => bin2hex($key_des),
+            'iv' => bin2hex($iv_des)
         ]);
 
         RC4::create([
@@ -102,9 +110,9 @@ class HomeController extends Controller
         return redirect('/home');
     }
 
-    public function Rc4encrypt($data, $key, $verse)
+    public function Rc4encrypt($data, $key, $is_file)
     {
-        if ($verse == 1) $plaintext = file_get_contents($data);
+        if ($is_file == 1) $plaintext = file_get_contents($data);
         else $plaintext = $data;
         $len = strlen($key);
         $S = range(0, 255);
@@ -128,7 +136,19 @@ class HomeController extends Controller
         }
         $ciphertext = bin2hex($ciphertext);
 
-        if ($verse == 1) file_put_contents($data, $ciphertext);
+        if ($is_file == 1) file_put_contents($data, $ciphertext);
+        else return $ciphertext;
+    }
+
+    public function Desencrypt($data, $key, $iv, $is_file)
+    {
+        if ($is_file == 1) $plaintext = file_get_contents($data);
+        else $plaintext = $data;
+
+        $ciphertext = openssl_encrypt($plaintext, 'des-ede-cfb', $key, 0, $iv);
+        $ciphertext = bin2hex($ciphertext);
+
+        if ($is_file == 1) file_put_contents($data, $ciphertext);
         else return $ciphertext;
     }
 }

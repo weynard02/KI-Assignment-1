@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('video');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->constrained();
             $table->string('key');
+            $table->string('iv');
             $table->timestamps();
         });
     }

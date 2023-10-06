@@ -10,7 +10,7 @@ class Des extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fullname', 'id_card', 'document', 'video', 'user_id', 'key'];
+    protected $fillable = ['fullname', 'id_card', 'document', 'video', 'user_id', 'key', 'iv'];
 
     public function user(): BelongsTo 
     {
