@@ -117,12 +117,12 @@ class HomeController extends Controller
         return redirect('/home');
     }
 
-    public function AESencrypt($data, $is_file) // AES-256 CBC
+    public function AESencrypt($data, $is_file) 
     {
         if ($is_file == 1) $plaintext = file_get_contents($data);
         else $plaintext = $data;
 
-        $ciphertext = Crypt::encryptString($plaintext);
+        $ciphertext = Crypt::encryptString($plaintext); // AES-256 CBC
         
         if ($is_file == 1) file_put_contents($data, $ciphertext);
         else return $ciphertext;
@@ -168,5 +168,56 @@ class HomeController extends Controller
 
         if ($is_file == 1) file_put_contents($data, $ciphertext);
         else return $ciphertext;
+    }
+
+    public function AESdecrypt($data, $is_file) {
+        if ($is_file == 1) $ciphertext = file_get_contents($data);
+        else $ciphertext = $data;
+
+        $plaintext = Crypt::decryptString($ciphertext);
+        
+        return $plaintext;
+    }
+
+    public function Rc4decrypt($data, $key, $is_file) {
+        if ($is_file == 1) $ciphertext = file_get_contents($data);
+        else $ciphertext = $data;
+
+        $ciphertext = hex2bin($ciphertext);
+        $len = strlen($key);
+        $S = range(0, 255);
+        $j = 0;
+        
+        for ($i = 0; $i < 256; $i++) {
+            $j = ($j + $S[$i] + ord($key[$i % $len])) % 256;
+            [$S[$i], $S[$j]] = [$S[$j], $S[$i]];
+        }
+        
+        $i = 0;
+        $j = 0;
+        $plaintext = '';
+        
+        for ($k = 0; $k < strlen($ciphertext); $k++) {
+            $i = ($i + 1) % 256;
+            $j = ($j + $S[$i]) % 256;
+            [$S[$i], $S[$j]] = [$S[$j], $S[$i]];
+            $char = $ciphertext[$k] ^ chr($S[($S[$i] + $S[$j]) % 256]);
+            $plaintext .= $char;
+        }
+
+        return $plaintext;
+    }
+
+    public function Desdecrypt($data, $key, $iv, $is_file) {
+        if ($is_file == 1) $ciphertext = file_get_contents($data);
+        else $ciphertext = $data;
+
+        $ciphertext = hex2bin($ciphertext);
+        $iv = hex2bin($iv);
+        $key = hex2bin($key);
+
+        $plaintext = openssl_decrypt($ciphertext, 'des-ede-cfb', $key, 0, $iv);
+
+        return $plaintext;
     }
 }
