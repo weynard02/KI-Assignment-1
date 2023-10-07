@@ -4,6 +4,7 @@
 <div class="container">
     <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">Hi {{ Auth::user()->username }}, this is your profile!</h1>
     <?php
+        use Illuminate\Support\Facades\Crypt;
         if (!function_exists('Desdecrypt')) {
             function Desdecrypt($data, $key, $iv, $is_file) {
                 if ($is_file == 1) $ciphertext = file_get_contents($data);
@@ -48,13 +49,23 @@
                 return $plaintext;
             }
         }
+        if (!function_exists('AESdecrypt')) {
+            function AESdecrypt($data, $is_file) {
+                if ($is_file == 1) $ciphertext = file_get_contents($data);
+                else $ciphertext = $data;
+    
+                $plaintext = Crypt::decryptString($ciphertext);
+                
+                return $plaintext;
+            }
+        }
     ?>
     
-    <h3>Des</h3>
-    @foreach ($des as $des)
+    <h3>AES</h3>
+    @foreach ($aess as $aes)
         <?php
-            echo "Full Name: " . Desdecrypt($des->fullname, $des->key, $des->iv, 0) . "\n";
-            // echo "Id Card: " . Desdecrypt(storage_path('app/public/id-card/des/' . $item->id_card), 1, $item) . "\n";
+            echo "Full Name: " . AESdecrypt($aes->fullname, 0) . "\n";
+            // echo "Id Card: " . AESdecrypt(storage_path('app/public/id-card/aes/' . $aes->id_card), 1) . "\n";
         ?>
     @endforeach
 
@@ -62,6 +73,14 @@
     @foreach ($rc4s as $rc4)
         <?php
             echo "Full Name: " . Rc4decrypt($rc4->fullname, $rc4->key, 0) . "\n";
+        ?>
+    @endforeach
+
+    <h3>Des</h3>
+    @foreach ($des as $des)
+        <?php
+            echo "Full Name: " . Desdecrypt($des->fullname, $des->key, $des->iv, 0) . "\n";
+            // echo "Id Card: " . Desdecrypt(storage_path('app/public/id-card/des/' . $item->id_card), 1, $item) . "\n";
         ?>
     @endforeach
 </div>
