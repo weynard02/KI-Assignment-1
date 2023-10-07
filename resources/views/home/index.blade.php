@@ -17,11 +17,17 @@
     <h3>Rc4</h3>
     @foreach ($rc4s as $rc4)
         Full Name: {{ $homeController->Rc4decrypt($rc4->fullname, $rc4->key, 0) }} <br>
+        ID-Card: <a href="/download/rc4/id_card/{{$rc4->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Document: <a href="/download/rc4/document/{{$rc4->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Video: <a href="/download/rc4/video/{{$rc4->id}}" class="btn btn-dark btn-sm">Download</a> <br>
     @endforeach
 
     <h3>Des</h3>
     @foreach ($des as $des)
         Full Name: {{ $homeController->Desdecrypt($des->fullname, $des->key, $des->iv, 0) }} <br>
+        ID-Card: <a href="/download/des/id_card/{{$des->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Document: <a href="/download/des/document/{{$des->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Video: <a href="/download/des/video/{{$des->id}}" class="btn btn-dark btn-sm">Download</a> <br>
     @endforeach
 </div>
 @endsection

@@ -17,7 +17,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // if (!Auth::user()) return redirect('/login');
         $des = Des::where('user_id', Auth::id())->get();
         $rc4s = Rc4::where('user_id', Auth::id())->get();
         $aess = Aes::where('user_id', Auth::id())->get();
@@ -26,13 +25,11 @@ class HomeController extends Controller
 
     public function create()
     {
-        // if (!Auth::user()) return redirect('/login');
         return view('home.create');
     }
 
     public function store(Request $request)
     {
-        // if (!Auth::user()) return redirect('/login');
         $request->validate(
             [
                 'fullname' => 'required',
@@ -146,10 +143,54 @@ class HomeController extends Controller
         }
         
         else if ($algo == 'des') {
+            $data = Des::findorfail($id);
+            if ($type == 'id_card') {
+                $file = $data->id_card;
+                $filePath = storage_path('app/public/id-card/des/' . $file);
+                $copyFilePath = storage_path('app/public/id-card/des/download_' . $file);
+            }
+            else if ($type == 'document') {
+                $file = $data->document;
+                $filePath = storage_path('app/public/document/des/' . $file);
+                $copyFilePath = storage_path('app/public/document/des/download_' . $file);
+            }
+            else if ($type == 'video') {
+                $file = $data->video;
+                $filePath = storage_path('app/public/video/des/' . $file);
+                $copyFilePath = storage_path('app/public/video/des/download_' . $file);
+            }
 
+            File::copy($filePath, $copyFilePath);
+
+            $this->Desdecrypt($copyFilePath, $data->key, $data->iv, 1);
+            $downloadFilePath = $copyFilePath;
+            
+            return response()->download($downloadFilePath)->deleteFileAfterSend(true);
         }
-        else {
+        else if($algo == 'rc4') {
+            $data = Rc4::findorfail($id);
+            if ($type == 'id_card') {
+                $file = $data->id_card;
+                $filePath = storage_path('app/public/id-card/rc4/' . $file);
+                $copyFilePath = storage_path('app/public/id-card/rc4/download_' . $file);
+            }
+            else if ($type == 'document') {
+                $file = $data->document;
+                $filePath = storage_path('app/public/document/rc4/' . $file);
+                $copyFilePath = storage_path('app/public/document/rc4/download_' . $file);
+            }
+            else if ($type == 'video') {
+                $file = $data->video;
+                $filePath = storage_path('app/public/video/rc4/' . $file);
+                $copyFilePath = storage_path('app/public/video/rc4/download_' . $file);
+            }
 
+            File::copy($filePath, $copyFilePath);
+
+            $this->Rc4decrypt($copyFilePath, $data->key, 1);
+            $downloadFilePath = $copyFilePath;
+            
+            return response()->download($downloadFilePath)->deleteFileAfterSend(true);
         }
     }
 
@@ -242,7 +283,8 @@ class HomeController extends Controller
             $plaintext .= $char;
         }
 
-        return $plaintext;
+        if ($is_file == 1) file_put_contents($data, $plaintext);
+        else return $plaintext;
     }
 
     public function Desdecrypt($data, $key, $iv, $is_file) {
@@ -255,6 +297,7 @@ class HomeController extends Controller
 
         $plaintext = openssl_decrypt($ciphertext, 'des-ede-cfb', $key, 0, $iv);
 
-        return $plaintext;
+        if ($is_file == 1) file_put_contents($data, $plaintext);
+        else return $plaintext;
     }
 }
