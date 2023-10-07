@@ -9,6 +9,7 @@ use App\Models\Rc4;
 use App\Http\Controllers\HomeController\Rc4encrypt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class HomeController extends Controller
 {
@@ -51,6 +52,7 @@ class HomeController extends Controller
         $iv_des = random_bytes(8);
         $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
         $fullname_rc4 = $this->Rc4encrypt($request->fullname, date('ymdhis'), 0);
+        $fullname_aes = Crypt::encryptString($request->fullname);
 
         $id_card_file = $request->file('id_card');
         $id_card_ext = $id_card_file->extension();
@@ -80,7 +82,7 @@ class HomeController extends Controller
         $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), date('ymdhis'), 1);
 
         Aes::create([
-            'fullname' => $request->fullname,
+            'fullname' => $fullname_aes,
             'id_card' => $id_card_new,
             'document' => $document_new,
             'video' => $video_new,
