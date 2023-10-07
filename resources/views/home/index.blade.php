@@ -9,6 +9,9 @@
     <h3>AES</h3>
     @foreach ($aess as $aes)
         Full Name: {{ $homeController->AESdecrypt($aes->fullname, 0) }} <br>
+        ID-Card: <a href="/download/aes/id_card/{{$aes->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Document: <a href="/download/aes/document/{{$aes->id}}" class="btn btn-dark btn-sm">Download</a> <br>
+        Video: <a href="/download/aes/video/{{$aes->id}}" class="btn btn-dark btn-sm">Download</a> <br>
     @endforeach
 
     <h3>Rc4</h3>

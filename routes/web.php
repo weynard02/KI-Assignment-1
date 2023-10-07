@@ -28,3 +28,5 @@ Route::post('/login', [UserController::class, 'login']);
 Route::get('/logout', [UserController::class, 'logout']);
 Route::get('/register', [UserController::class, 'register']);
 Route::post('/register', [UserController::class, 'create']);
+
+Route::get('/download/{algo}/{type}/{id}', [HomeController::class, 'download']);

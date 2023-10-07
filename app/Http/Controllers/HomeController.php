@@ -7,6 +7,7 @@ use App\Models\Aes;
 use App\Models\Des;
 use App\Models\Rc4;
 use App\Http\Controllers\HomeController\Rc4encrypt;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -117,6 +118,40 @@ class HomeController extends Controller
 
         return redirect('/home');
     }
+    public function download($algo, $type, $id) {
+        if ($algo == 'aes') {
+            $data = Aes::findorfail($id);
+            if ($type == 'id_card') {
+                $file = $data->id_card;
+                $filePath = storage_path('app/public/id-card/aes/' . $file);
+                $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
+            }
+            else if ($type == 'document') {
+                $file = $data->document;
+                $filePath = storage_path('app/public/document/aes/' . $file);
+                $copyFilePath = storage_path('app/public/document/aes/download_' . $file);
+            }
+            else if ($type == 'video') {
+                $file = $data->video;
+                $filePath = storage_path('app/public/video/aes/' . $file);
+                $copyFilePath = storage_path('app/public/video/aes/download_' . $file);
+            }
+
+            File::copy($filePath, $copyFilePath);
+
+            $this->AESDecrypt($copyFilePath, 1);
+            $downloadFilePath = $copyFilePath;
+            
+            return response()->download($downloadFilePath)->deleteFileAfterSend(true);
+        }
+        
+        else if ($algo == 'des') {
+
+        }
+        else {
+
+        }
+    }
 
     public function AESencrypt($data, $is_file) 
     {
@@ -177,7 +212,8 @@ class HomeController extends Controller
 
         $plaintext = Crypt::decryptString($ciphertext);
         
-        return $plaintext;
+        if ($is_file == 1) file_put_contents($data, $plaintext);
+        else return $plaintext;
     }
 
     public function Rc4decrypt($data, $key, $is_file) {
