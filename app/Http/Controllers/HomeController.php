@@ -52,8 +52,9 @@ class HomeController extends Controller
 
         $key_des = random_bytes(7);
         $iv_des = random_bytes(8);
+        $key_rc4 = date('ymdhis');
         $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
-        $fullname_rc4 = $this->Rc4encrypt($request->fullname, date('ymdhis'), 0);
+        $fullname_rc4 = $this->Rc4encrypt($request->fullname, $key_rc4, 0);
         $fullname_aes = $this->AESencrypt($request->fullname, 0);
 
         $id_card_file = $request->file('id_card');
@@ -111,7 +112,7 @@ class HomeController extends Controller
             'document' => $document_new,
             'video' => $video_new,
             'user_id' => Auth::user()->id,
-            'key' => date('ymdhis')
+            'key' => $key_rc4
         ]);
 
         return redirect('/home');
