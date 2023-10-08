@@ -28,8 +28,13 @@
                     @enderror
                 </div>
                 <!-- Submit button -->
-                <button type="submit" class="btn btn-dark align-items-center w-100 d-flex flex-column" style="background-color: #202020">Register</button>
+                <button type="submit" class="btn btn-dark align-items-center w-100 d-flex flex-column mb-4" style="background-color: #202020">Register</button>
             </form>
+
+            <div class="d-flex align-items-center justify-content-center pb-4">
+                <p class="mb-0 me-2">Already have an account?</p>
+                <a href="/login" class="btn btn-outline-dark">Log In</a>
+            </div>
         </div>
 
         <div class="col-md-6 rounded-5 d-flex justify-content-center align-items-center flex-column left-box">
@@ -38,5 +43,7 @@
             </div>
         </div>
     </div>
+
+    
 </div>
 @endsection

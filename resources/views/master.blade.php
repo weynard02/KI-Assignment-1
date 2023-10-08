@@ -6,6 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Assignment KI 1</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+      .gradient-custom {
+          /* fallback for old browsers */
+          background: #f6d365;
+
+          /* Chrome 10-25, Safari 5.1-6 */
+          background: -webkit-linear-gradient(to right bottom, #f6d365, #fda085);
+
+          /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+          background: linear-gradient(to right bottom, #f6d365, #fda085);
+      }
+  </style>
 </head>
 
 <body style="background-color: #d1e5e6; font-family: Montserrat, sans-serif">

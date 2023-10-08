@@ -17,10 +17,10 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $des = Des::where('user_id', Auth::user()->id)->get();
+        $dess = Des::where('user_id', Auth::user()->id)->get();
         $rc4s = Rc4::where('user_id', Auth::user()->id)->get();
         $aess = Aes::where('user_id', Auth::user()->id)->get();
-        return view('home.index', compact('des', 'rc4s', 'aess'));
+        return view('home.index', compact('dess', 'rc4s', 'aess'));
     }
 
     public function create()
