@@ -15,13 +15,16 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/', function () {
-    return view('session/welcome');
-});
+// Route::get('/', function () {
+//     return view('session/welcome');
+// });
+Route::get('/', [UserController::class, 'welcome']);
 
 Route::get('/home', [HomeController::class, 'index'])->middleware('auth');
 Route::get('/home/create', [HomeController::class, 'create'])->middleware('auth');
 Route::post('/home', [HomeController::class, 'store'])->middleware('auth');
+Route::get('/home/edit', [HomeController::class, 'edit'])->middleware('auth');
+Route::put('/home', [HomeController::class, 'update'])->middleware('auth');
 
 Route::get('/login', [UserController::class, 'index'])->name('login');
 Route::post('/login', [UserController::class, 'login']);

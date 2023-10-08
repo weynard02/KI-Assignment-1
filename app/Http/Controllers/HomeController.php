@@ -17,15 +17,22 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $des = Des::where('user_id', Auth::id())->get();
-        $rc4s = Rc4::where('user_id', Auth::id())->get();
-        $aess = Aes::where('user_id', Auth::id())->get();
+        $des = Des::where('user_id', Auth::user()->id)->get();
+        $rc4s = Rc4::where('user_id', Auth::user()->id)->get();
+        $aess = Aes::where('user_id', Auth::user()->id)->get();
         return view('home.index', compact('des', 'rc4s', 'aess'));
     }
 
     public function create()
     {
-        return view('home.create');
+        $aess = Aes::where('user_id', Auth::user()->id)->get();
+        return view('home.create', compact('aess'));
+    }
+
+    public function edit()
+    {
+        $aess = Aes::where('user_id', Auth::user()->id)->get();
+        return view('home.edit', compact('aess'));
     }
 
     public function store(Request $request)
@@ -115,6 +122,92 @@ class HomeController extends Controller
 
         return redirect('/home');
     }
+
+    public function update(Request $request)
+    {
+        $request->validate(
+            [
+                'fullname' => 'required',
+                'id_card' => 'required|mimes:jpg,jpeg,png',
+                'document' => 'required|mimes:pdf,docx,xls',
+                'video' => 'required|mimes:mp4,mov,avi',
+            ],
+            [
+                'fullname.required' => 'Fullname can\'t be empty!',
+                'id_card.required' => 'ID Card can\'t be empty!',
+                'id_card.mimes' => 'Allowed ID Card extension are JPG, JPEG, and PNG!',
+                'document.required' => 'Document can\'t be empty!',
+                'document.mimes' => 'Allowed ID Card extension are PDF, DOCX, and XLS!',
+                'video.required' => 'Video can\'t be empty!',
+                'video.mimes' => 'Allowed ID Card extension are MP4, MOV, and AVI!'
+            ]
+        );
+    
+        $key_des = random_bytes(7);
+        $iv_des = random_bytes(8);
+        $key_rc4 = date('ymdhis');
+        $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
+        $fullname_rc4 = $this->Rc4encrypt($request->fullname, $key_rc4, 0);
+        $fullname_aes = $this->AESencrypt($request->fullname, 0);
+    
+        $id_card_file = $request->file('id_card');
+        $id_card_ext = $id_card_file->extension();
+        $id_card_new = date('ymdhis') . "." . $id_card_ext;
+        $id_card_file->storeAs('public/id-card/aes', $id_card_new);
+        $id_card_file->storeAs('public/id-card/des', $id_card_new);
+        $id_card_file->storeAs('public/id-card/rc4', $id_card_new);
+        $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
+        $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), $key_rc4, 1);
+        $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), 1);
+    
+        $document_file = $request->file('document');
+        $document_ext = $document_file->extension();
+        $document_new = date('ymdhis') . "." . $document_ext;
+        $document_file->storeAs('public/document/aes', $document_new);
+        $document_file->storeAs('public/document/des', $document_new);
+        $document_file->storeAs('public/document/rc4', $document_new);
+        $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
+        $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), $key_rc4, 1);
+        $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), 1);
+    
+        $video_file = $request->file('video');
+        $video_ext = $video_file->extension();
+        $video_new = date('ymdhis') . "." . $video_ext;
+        $video_file->storeAs('public/video/aes', $video_new);
+        $video_file->storeAs('public/video/des', $video_new);
+        $video_file->storeAs('public/video/rc4', $video_new);
+        $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
+        $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), $key_rc4, 1);
+        $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), 1);
+    
+        Aes::where('user_id', Auth::user()->id)->update([
+            'fullname' => $fullname_aes,
+            'id_card' => $id_card_new,
+            'document' => $document_new,
+            'video' => $video_new,
+            'key' => Config::get('app.key')
+        ]);
+    
+        Des::where('user_id', Auth::user()->id)->update([
+            'fullname' => $fullname_des,
+            'id_card' => $id_card_new,
+            'document' => $document_new,
+            'video' => $video_new,
+            'key' => bin2hex($key_des),
+            'iv' => bin2hex($iv_des)
+        ]);
+    
+        RC4::where('user_id', Auth::user()->id)->update([
+            'fullname' => $fullname_rc4,
+            'id_card' => $id_card_new,
+            'document' => $document_new,
+            'video' => $video_new,
+            'key' => $key_rc4
+        ]);
+    
+        return redirect('/home');
+    }    
+
     public function download($algo, $type, $id) {
         if ($algo == 'aes') {
             $data = Aes::findorfail($id);

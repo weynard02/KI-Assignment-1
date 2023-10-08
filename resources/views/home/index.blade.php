@@ -5,7 +5,12 @@
 @endphp
 @section('content')
 <div class="container">
-    <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">Hi {{ Auth::user()->username }}, this is your profile!</h1>
+    @if(count($aess) > 0)
+        <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">Hi {{ Auth::user()->username }}, this is your profile!</h1>
+    @else
+        <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">Hi {{ Auth::user()->username }}, please complete your profile!</h1>
+    @endif
+
     <h3>AES</h3>
     @foreach ($aess as $aes)
         Full Name: {{ $homeController->AESdecrypt($aes->fullname, 0) }} <br>

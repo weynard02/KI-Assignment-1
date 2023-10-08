@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Aes;
+use App\Models\Des;
+use App\Models\Rc4;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function welcome(){
+        $aess = Aes::where('user_id', Auth::id())->get();
+        return view('session.welcome', compact('aess'));
+    }
+
     public function index(){
         return view('session.login');
     }

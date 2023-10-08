@@ -14,9 +14,15 @@
                 </li>
                 @endguest
                 @auth
+                @if(!is_null($aess) && count($aess) < 1)
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('home/create') ? 'active' : ''}}" aria-current="page" href="/home/create">Upload</a>
                 </li>
+                @else
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('home/edit') ? 'active' : ''}}" aria-current="page" href="/home/edit">Update</a>
+                </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('home') ? 'active' : ''}}" href="/home">Profile</a>
                 </li>
