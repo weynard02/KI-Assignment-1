@@ -1,5 +1,8 @@
 @extends('master')
 @include('navbar')
+@php
+    $homeController = app('App\Http\Controllers\HomeController');
+@endphp
 @section('content')
 <div class="container">
     <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">Edit Your Profile</h1>
@@ -8,7 +11,7 @@
         @method('put')
         <div class="form-group mb-3" style="margin-top: 40px">
             <label class="fw-bold" style="font-size: 20px;">Full Name</label>
-            <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name">
+            <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name" value="{{$homeController->AESdecrypt($aess->first()->fullname, 0)}}">
             @error('fullname')
             <div class="alert alert-danger fs-6 text">{{ $message }}</div>
             @enderror

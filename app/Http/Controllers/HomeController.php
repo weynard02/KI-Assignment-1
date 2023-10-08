@@ -26,6 +26,7 @@ class HomeController extends Controller
     public function create()
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
+        if (!$aess->isEmpty()) return redirect('/home/edit');
         return view('home.create', compact('aess'));
     }
 
