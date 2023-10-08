@@ -62,7 +62,7 @@ class HomeController extends Controller
         $id_card_file->storeAs('public/id-card/des', $id_card_new);
         $id_card_file->storeAs('public/id-card/rc4', $id_card_new);
         $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
-        $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), date('ymdhis'), 1);
+        $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), 1);
 
         $document_file = $request->file('document');
@@ -72,7 +72,7 @@ class HomeController extends Controller
         $document_file->storeAs('public/document/des', $document_new);
         $document_file->storeAs('public/document/rc4', $document_new);
         $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
-        $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), date('ymdhis'), 1);
+        $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), 1);
 
         $video_file = $request->file('video');
@@ -82,7 +82,7 @@ class HomeController extends Controller
         $video_file->storeAs('public/video/des', $video_new);
         $video_file->storeAs('public/video/rc4', $video_new);
         $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
-        $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), date('ymdhis'), 1);
+        $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), 1);
 
         Aes::create([
