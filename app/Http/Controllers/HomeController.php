@@ -50,9 +50,9 @@ class HomeController extends Controller
                 'id_card.required' => 'ID Card can\'t be empty!',
                 'id_card.mimes' => 'Allowed ID Card extension are JPG, JPEG, and PNG!',
                 'document.required' => 'Document can\'t be empty!',
-                'document.mimes' => 'Allowed ID Card extension are PDF, DOCX, and XLS!',
+                'document.mimes' => 'Allowed document extension are PDF, DOCX, and XLS!',
                 'video.required' => 'Video can\'t be empty!',
-                'video.mimes' => 'Allowed ID Card extension are MP4, MOV, and AVI!'
+                'video.mimes' => 'Allowed video extension are MP4, MOV, and AVI!'
             ]
         );
 
@@ -101,7 +101,7 @@ class HomeController extends Controller
             'user_id' => Auth::user()->id,
             'key' => Config::get('app.key')
         ]);
-        
+
         Des::create([
             'fullname' => $fullname_des,
             'id_card' => $id_card_new,
@@ -138,19 +138,19 @@ class HomeController extends Controller
                 'id_card.required' => 'ID Card can\'t be empty!',
                 'id_card.mimes' => 'Allowed ID Card extension are JPG, JPEG, and PNG!',
                 'document.required' => 'Document can\'t be empty!',
-                'document.mimes' => 'Allowed ID Card extension are PDF, DOCX, and XLS!',
+                'document.mimes' => 'Allowed document extension are PDF, DOCX, and XLS!',
                 'video.required' => 'Video can\'t be empty!',
-                'video.mimes' => 'Allowed ID Card extension are MP4, MOV, and AVI!'
+                'video.mimes' => 'Allowed video extension are MP4, MOV, and AVI!'
             ]
         );
-    
+
         $key_des = random_bytes(7);
         $iv_des = random_bytes(8);
         $key_rc4 = date('ymdhis');
         $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
         $fullname_rc4 = $this->Rc4encrypt($request->fullname, $key_rc4, 0);
         $fullname_aes = $this->AESencrypt($request->fullname, 0);
-    
+
         $id_card_file = $request->file('id_card');
         $id_card_ext = $id_card_file->extension();
         $id_card_new = date('ymdhis') . "." . $id_card_ext;
@@ -160,7 +160,7 @@ class HomeController extends Controller
         $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), 1);
-    
+
         $document_file = $request->file('document');
         $document_ext = $document_file->extension();
         $document_new = date('ymdhis') . "." . $document_ext;
@@ -170,7 +170,7 @@ class HomeController extends Controller
         $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), 1);
-    
+
         $video_file = $request->file('video');
         $video_ext = $video_file->extension();
         $video_new = date('ymdhis') . "." . $video_ext;
@@ -180,7 +180,7 @@ class HomeController extends Controller
         $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), $key_rc4, 1);
         $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), 1);
-    
+
         Aes::where('user_id', Auth::user()->id)->update([
             'fullname' => $fullname_aes,
             'id_card' => $id_card_new,
@@ -188,7 +188,7 @@ class HomeController extends Controller
             'video' => $video_new,
             'key' => Config::get('app.key')
         ]);
-    
+
         Des::where('user_id', Auth::user()->id)->update([
             'fullname' => $fullname_des,
             'id_card' => $id_card_new,
@@ -197,7 +197,7 @@ class HomeController extends Controller
             'key' => bin2hex($key_des),
             'iv' => bin2hex($iv_des)
         ]);
-    
+
         RC4::where('user_id', Auth::user()->id)->update([
             'fullname' => $fullname_rc4,
             'id_card' => $id_card_new,
@@ -205,9 +205,9 @@ class HomeController extends Controller
             'video' => $video_new,
             'key' => $key_rc4
         ]);
-    
+
         return redirect('/home');
-    }    
+    }
 
     public function download($algo, $type, $id) {
         if ($algo == 'aes') {
@@ -232,10 +232,10 @@ class HomeController extends Controller
 
             $this->AESDecrypt($copyFilePath, 1);
             $downloadFilePath = $copyFilePath;
-            
+
             return response()->download($downloadFilePath)->deleteFileAfterSend(true);
         }
-        
+
         else if ($algo == 'des') {
             $data = Des::findorfail($id);
             if ($type == 'id_card') {
@@ -258,7 +258,7 @@ class HomeController extends Controller
 
             $this->Desdecrypt($copyFilePath, $data->key, $data->iv, 1);
             $downloadFilePath = $copyFilePath;
-            
+
             return response()->download($downloadFilePath)->deleteFileAfterSend(true);
         }
         else if($algo == 'rc4') {
@@ -283,18 +283,18 @@ class HomeController extends Controller
 
             $this->Rc4decrypt($copyFilePath, $data->key, 1);
             $downloadFilePath = $copyFilePath;
-            
+
             return response()->download($downloadFilePath)->deleteFileAfterSend(true);
         }
     }
 
-    public function AESencrypt($data, $is_file) 
+    public function AESencrypt($data, $is_file)
     {
         if ($is_file == 1) $plaintext = file_get_contents($data);
         else $plaintext = $data;
 
         $ciphertext = Crypt::encryptString($plaintext); // AES-256 CBC
-        
+
         if ($is_file == 1) file_put_contents($data, $ciphertext);
         else return $ciphertext;
 
@@ -306,16 +306,16 @@ class HomeController extends Controller
         $len = strlen($key);
         $S = range(0, 255);
         $j = 0;
-        
+
         for ($i = 0; $i < 256; $i++) {
             $j = ($j + $S[$i] + ord($key[$i % $len])) % 256;
             [$S[$i], $S[$j]] = [$S[$j], $S[$i]];
         }
-        
+
         $i = 0;
         $j = 0;
         $ciphertext = '';
-        
+
         for ($k = 0; $k < strlen($plaintext); $k++) {
             $i = ($i + 1) % 256;
             $j = ($j + $S[$i]) % 256;
@@ -346,7 +346,7 @@ class HomeController extends Controller
         else $ciphertext = $data;
 
         $plaintext = Crypt::decryptString($ciphertext);
-        
+
         if ($is_file == 1) file_put_contents($data, $plaintext);
         else return $plaintext;
     }
@@ -359,16 +359,16 @@ class HomeController extends Controller
         $len = strlen($key);
         $S = range(0, 255);
         $j = 0;
-        
+
         for ($i = 0; $i < 256; $i++) {
             $j = ($j + $S[$i] + ord($key[$i % $len])) % 256;
             [$S[$i], $S[$j]] = [$S[$j], $S[$i]];
         }
-        
+
         $i = 0;
         $j = 0;
         $plaintext = '';
-        
+
         for ($k = 0; $k < strlen($ciphertext); $k++) {
             $i = ($i + 1) % 256;
             $j = ($j + $S[$i]) % 256;
