@@ -345,7 +345,26 @@ class HomeController extends Controller
         if ($is_file == 1) $ciphertext = file_get_contents($data);
         else $ciphertext = $data;
 
+        // Start calculating usage statistics
+        $start_usage = getrusage();
+
         $plaintext = Crypt::decryptString($ciphertext);
+
+        // Stop calculating usage statistics
+        $end_usage = getrusage();
+
+        // Output user run time and system run time from usage statistics
+        $user_time = $end_usage["ru_utime.tv_sec"] - $start_usage["ru_utime.tv_sec"];
+        $user_time += ($end_usage["ru_utime.tv_usec"] - $start_usage["ru_utime.tv_usec"]) / 1000000;
+
+        $system_time = $end_usage["ru_stime.tv_sec"] - $start_usage["ru_stime.tv_sec"];
+        $system_time += ($end_usage["ru_stime.tv_usec"] - $start_usage["ru_stime.tv_usec"]) / 1000000;
+
+        error_log("AES Decryption user run time : " . $user_time . " second");
+        error_log("AES Decryption system run time : " . $system_time . " second");
+
+        $total_time = $user_time + $system_time;
+        error_log("AES Decryption total time : " . $total_time . " second");
 
         if ($is_file == 1) file_put_contents($data, $plaintext);
         else return $plaintext;
@@ -354,6 +373,9 @@ class HomeController extends Controller
     public function Rc4decrypt($data, $key, $is_file) {
         if ($is_file == 1) $ciphertext = file_get_contents($data);
         else $ciphertext = $data;
+
+        // Start calculating usage statistics
+        $start_usage = getrusage();
 
         $ciphertext = hex2bin($ciphertext);
         $len = strlen($key);
@@ -377,6 +399,22 @@ class HomeController extends Controller
             $plaintext .= $char;
         }
 
+        // Stop calculating usage statistics
+        $end_usage = getrusage();
+
+        // Output user run time and system run time from usage statistics
+        $user_time = $end_usage["ru_utime.tv_sec"] - $start_usage["ru_utime.tv_sec"];
+        $user_time += ($end_usage["ru_utime.tv_usec"] - $start_usage["ru_utime.tv_usec"]) / 1000000;
+
+        $system_time = $end_usage["ru_stime.tv_sec"] - $start_usage["ru_stime.tv_sec"];
+        $system_time += ($end_usage["ru_stime.tv_usec"] - $start_usage["ru_stime.tv_usec"]) / 1000000;
+
+        error_log("RC4 Decryption user run time : " . $user_time . " second");
+        error_log("RC4 Decryption system run time : " . $system_time . " second");
+
+        $total_time = $user_time + $system_time;
+        error_log("RC4 Decryption total time : " . $total_time . " second");
+
         if ($is_file == 1) file_put_contents($data, $plaintext);
         else return $plaintext;
     }
@@ -385,11 +423,30 @@ class HomeController extends Controller
         if ($is_file == 1) $ciphertext = file_get_contents($data);
         else $ciphertext = $data;
 
+        // Start calculating usage statistics
+        $start_usage = getrusage();
+
         $ciphertext = hex2bin($ciphertext);
         $iv = hex2bin($iv);
         $key = hex2bin($key);
 
         $plaintext = openssl_decrypt($ciphertext, 'des-ede-cfb', $key, 0, $iv);
+
+        // Stop calculating usage statistics
+        $end_usage = getrusage();
+
+        // Output user run time and system run time from usage statistics
+        $user_time = $end_usage["ru_utime.tv_sec"] - $start_usage["ru_utime.tv_sec"];
+        $user_time += ($end_usage["ru_utime.tv_usec"] - $start_usage["ru_utime.tv_usec"]) / 1000000;
+
+        $system_time = $end_usage["ru_stime.tv_sec"] - $start_usage["ru_stime.tv_sec"];
+        $system_time += ($end_usage["ru_stime.tv_usec"] - $start_usage["ru_stime.tv_usec"]) / 1000000;
+
+        error_log("DES Decryption user run time : " . $user_time . " second");
+        error_log("DES Decryption system run time : " . $system_time . " second");
+
+        $total_time = $user_time + $system_time;
+        error_log("DES Decryption total time : " . $total_time . " second");
 
         if ($is_file == 1) file_put_contents($data, $plaintext);
         else return $plaintext;
