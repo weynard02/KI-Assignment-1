@@ -19,3 +19,26 @@ The method that we are using to benchmark the 3 encryption method is by comparin
 
 ### AES
 ![1](images/AES.png)
+
+| File size | Average time |
+|-----------|--------------|
+| 500 kB    | 0.006678     |
+| 1 MB      | 0.014271     |
+| 2 MB      | 0.024004     |
+
+### DES
+![2](images/DES.png)
+| File size | Average time |
+|-----------|--------------|
+| 500 kB    | 0.01681      |
+| 1 MB      | 0.065642     |
+| 2 MB      | 0.111473     |
+
+### RC4
+![3](images/RC4.png)
+| File size | Average time |
+|-----------|--------------|
+| 500 kB    | 0.102148     |
+| 1 MB      | 0.21458      |
+| 2 MB      | 0.301408     |
+
