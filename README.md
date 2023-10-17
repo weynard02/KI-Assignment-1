@@ -14,20 +14,20 @@ To showcase the difference between 3 distinct encryption method, namely Advanced
 3. Encrypting files and storing it in the database
 4. Decrypting stored files before downloading
 
-Here are the preview of our website:
-> Welcome page  
+Here is a preview of our website:
+#### Homepage  
 ![11](images/homepage.png)
-> Register page  
+#### Register page  
 ![12](images/register.png)
-> Login page  
+#### Login page  
 ![13](images/login.png)
-> Edit files  
+#### Edit files and username  
 ![14](images/edit.png)
-> Download files  
+#### Download files  
 ![15](images/download.png)
 
 ## Benchmark
-The method that we are using to benchmark the 3 encryption method is comparing the decryption time for each method for 3 different file sizes 500kB, 1MB, and 2 MB. The reason the file size is small is due to the size restriction that is given for an HTTP POST request. The time measured are user run time and system run time using the `rusage()` function in PHP. We take 30 tries for each combination, therefore making 810 tries in total. The results are as follows:
+The methodology employed for benchmarking the three encryption methods involves a comparative analysis of their decryption times across three distinct file sizes: 500KB, 1MB, and 2MB. The constraint of adhering to the size limitations imposed by HTTP POST requests necessitates the use of smaller file sizes. To measure decryption performance, the evaluation leverages the user runtime and system runtime metrics obtained through the utilization of the rusage() function in PHP. This process entails conducting 30 iterations for each combination, thereby accumulating a total of 270 trials. The resulting outcomes are summarized as follows:
 
 ### AES
 ![1](images/AES.png)
@@ -55,4 +55,4 @@ The method that we are using to benchmark the 3 encryption method is comparing t
 | 2 MB      | 0.301408     |
 
 ## Result
-
+In terms of processing speed, the test results indicate that AES outperformed the other two encryption methods, which is noteworthy considering AES is renowned for its robust security features. This counterintuitive outcome underscores the efficiency of AES encryption. Following AES, DES emerged as the second fastest, with RC4 ranking third in terms of speed. 
