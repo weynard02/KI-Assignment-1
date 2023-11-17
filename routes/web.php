@@ -25,6 +25,7 @@ Route::get('/home/create', [HomeController::class, 'create'])->middleware('auth'
 Route::post('/home', [HomeController::class, 'store'])->middleware('auth');
 Route::get('/home/edit', [HomeController::class, 'edit'])->middleware('auth');
 Route::put('/home', [HomeController::class, 'update'])->middleware('auth');
+Route::get('/home/users', [HomeController::class, 'seeUsers'])->middleware('auth');
 
 Route::get('/login', [UserController::class, 'index'])->name('login');
 Route::post('/login', [UserController::class, 'login']);

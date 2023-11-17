@@ -26,6 +26,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('home') ? 'active' : ''}}" href="/home">Profile</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('home/users') ? 'active' : ''}}" href="/home/users">Users</a>
+                </li>
                 <li><a class="nav-link" href="/logout">Log Out</a></li>
                 @endauth
             </ul>

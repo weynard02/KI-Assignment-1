@@ -23,6 +23,12 @@ class HomeController extends Controller
         return view('home.index', compact('dess', 'rc4s', 'aess'));
     }
 
+    public function seeUsers() {
+        $aess = Aes::where('user_id', Auth::user()->id)->get();
+        $usernames = User::all()->pluck('username');
+        return view('home.users', compact('usernames', 'aess'));
+    }
+
     public function create()
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
