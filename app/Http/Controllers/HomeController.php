@@ -25,7 +25,7 @@ class HomeController extends Controller
 
     public function seeUsers() {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
-        $usernames = User::all()->pluck('username');
+        $usernames = User::select('id', 'username')->get();
         return view('home.users', compact('usernames', 'aess'));
     }
 
