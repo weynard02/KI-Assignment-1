@@ -18,7 +18,14 @@ return new class extends Migration
             $table->string('document');
             $table->string('video');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->constrained();
-            $table->string('key');
+            $table->string('fullname_key');
+            $table->string('fullname_iv');
+            $table->string('id_card_key');
+            $table->string('id_card_iv');
+            $table->string('document_key');
+            $table->string('document_iv');
+            $table->string('video_key');
+            $table->string('video_iv');
             $table->timestamps();
         });
     }

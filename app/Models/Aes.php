@@ -10,7 +10,7 @@ class Aes extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fullname', 'id_card', 'document', 'video', 'user_id', 'key'];
+    protected $fillable = ['fullname', 'id_card', 'document', 'video', 'user_id', 'fullname_key', 'fullname_iv', 'id_card_key', 'id_card_iv', 'document_key', 'document_iv', 'video_key', 'video_iv'];
 
     public function user(): BelongsTo 
     {

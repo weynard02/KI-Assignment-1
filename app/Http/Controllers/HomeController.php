@@ -61,14 +61,19 @@ class HomeController extends Controller
                 'video.mimes' => 'Allowed video extension are MP4, MOV, and AVI!'
             ]
         );
-
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $key_des = random_bytes(7);
         $iv_des = random_bytes(8);
         $key_rc4 = date('ymdhis');
         $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
         $fullname_rc4 = $this->Rc4encrypt($request->fullname, $key_rc4, 0);
-        $fullname_aes = $this->AESencrypt($request->fullname, 0);
+        $fullname_aes = $this->AESencrypt($request->fullname, $key_aes, $iv_aes, 0);
+        $fullname_key = $key_aes;
+        $fullname_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $id_card_file = $request->file('id_card');
         $id_card_ext = $id_card_file->extension();
         $id_card_new = date('ymdhis') . "." . $id_card_ext;
@@ -77,8 +82,12 @@ class HomeController extends Controller
         $id_card_file->storeAs('public/id-card/rc4', $id_card_new);
         $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), 1);
+        $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), $key_aes, $iv_aes, 1);
+        $id_card_key = $key_aes;
+        $id_card_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $document_file = $request->file('document');
         $document_ext = $document_file->extension();
         $document_new = date('ymdhis') . "." . $document_ext;
@@ -87,8 +96,12 @@ class HomeController extends Controller
         $document_file->storeAs('public/document/rc4', $document_new);
         $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), 1);
+        $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), $key_aes, $iv_aes, 1);
+        $document_key = $key_aes;
+        $document_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $video_file = $request->file('video');
         $video_ext = $video_file->extension();
         $video_new = date('ymdhis') . "." . $video_ext;
@@ -97,7 +110,9 @@ class HomeController extends Controller
         $video_file->storeAs('public/video/rc4', $video_new);
         $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), 1);
+        $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), $key_aes, $iv_aes, 1);
+        $video_key = $key_aes;
+        $video_iv = $iv_aes;
 
         Aes::create([
             'fullname' => $fullname_aes,
@@ -105,7 +120,14 @@ class HomeController extends Controller
             'document' => $document_new,
             'video' => $video_new,
             'user_id' => Auth::user()->id,
-            'key' => Config::get('app.key')
+            'fullname_key' => base64_encode($fullname_key),
+            'fullname_iv' => base64_encode($fullname_iv),
+            'id_card_key' => base64_encode($id_card_key),
+            'id_card_iv' => base64_encode($id_card_iv),
+            'document_key' => base64_encode($document_key),
+            'document_iv' => base64_encode($document_iv),
+            'video_key' => base64_encode($video_key),
+            'video_iv' => base64_encode($video_iv),
         ]);
 
         Des::create([
@@ -150,13 +172,19 @@ class HomeController extends Controller
             ]
         );
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $key_des = random_bytes(7);
         $iv_des = random_bytes(8);
         $key_rc4 = date('ymdhis');
         $fullname_des = $this->Desencrypt($request->fullname, $key_des, $iv_des, 0);
         $fullname_rc4 = $this->Rc4encrypt($request->fullname, $key_rc4, 0);
-        $fullname_aes = $this->AESencrypt($request->fullname, 0);
+        $fullname_aes = $this->AESencrypt($request->fullname, $key_aes, $iv_aes, 0);
+        $fullname_key = $key_aes;
+        $fullname_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $id_card_file = $request->file('id_card');
         $id_card_ext = $id_card_file->extension();
         $id_card_new = date('ymdhis') . "." . $id_card_ext;
@@ -165,8 +193,12 @@ class HomeController extends Controller
         $id_card_file->storeAs('public/id-card/rc4', $id_card_new);
         $this->Desencrypt(storage_path('app/public/id-card/des/' . $id_card_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/id-card/rc4/' . $id_card_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), 1);
+        $this->AESencrypt(storage_path('app/public/id-card/aes/' . $id_card_new), $key_aes, $iv_aes, 1);
+        $id_card_key = $key_aes;
+        $id_card_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $document_file = $request->file('document');
         $document_ext = $document_file->extension();
         $document_new = date('ymdhis') . "." . $document_ext;
@@ -175,8 +207,12 @@ class HomeController extends Controller
         $document_file->storeAs('public/document/rc4', $document_new);
         $this->Desencrypt(storage_path('app/public/document/des/' . $document_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/document/rc4/' . $document_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), 1);
+        $this->AESencrypt(storage_path('app/public/document/aes/' . $document_new), $key_aes, $iv_aes, 1);
+        $document_key = $key_aes;
+        $document_iv = $iv_aes;
 
+        $key_aes = openssl_random_pseudo_bytes(32);
+        $iv_aes = openssl_random_pseudo_bytes(16);
         $video_file = $request->file('video');
         $video_ext = $video_file->extension();
         $video_new = date('ymdhis') . "." . $video_ext;
@@ -185,14 +221,23 @@ class HomeController extends Controller
         $video_file->storeAs('public/video/rc4', $video_new);
         $this->Desencrypt(storage_path('app/public/video/des/' . $video_new), $key_des, $iv_des, 1);
         $this->Rc4encrypt(storage_path('app/public/video/rc4/' . $video_new), $key_rc4, 1);
-        $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), 1);
+        $this->AESencrypt(storage_path('app/public/video/aes/' . $video_new), $key_aes, $iv_aes, 1);
+        $video_key = $key_aes;
+        $video_iv = $iv_aes;
 
         Aes::where('user_id', Auth::user()->id)->update([
             'fullname' => $fullname_aes,
             'id_card' => $id_card_new,
             'document' => $document_new,
             'video' => $video_new,
-            'key' => Config::get('app.key')
+            'fullname_key' => base64_encode($fullname_key),
+            'fullname_iv' => base64_encode($fullname_iv),
+            'id_card_key' => base64_encode($id_card_key),
+            'id_card_iv' => base64_encode($id_card_iv),
+            'document_key' => base64_encode($document_key),
+            'document_iv' => base64_encode($document_iv),
+            'video_key' => base64_encode($video_key),
+            'video_iv' => base64_encode($video_key),
         ]);
 
         Des::where('user_id', Auth::user()->id)->update([
@@ -218,25 +263,33 @@ class HomeController extends Controller
     public function download($algo, $type, $id) {
         if ($algo == 'aes') {
             $data = Aes::findorfail($id);
+            $key = $data->fullname_key;
+            $iv = $data->fullname_iv;
             if ($type == 'id_card') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/aes/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
+                $key = $data->id_card_key;
+                $iv = $data->id_card_iv;
             }
             else if ($type == 'document') {
                 $file = $data->document;
                 $filePath = storage_path('app/public/document/aes/' . $file);
                 $copyFilePath = storage_path('app/public/document/aes/download_' . $file);
+                $key = $data->document_key;
+                $iv = $data->document_iv;
             }
             else if ($type == 'video') {
                 $file = $data->video;
                 $filePath = storage_path('app/public/video/aes/' . $file);
                 $copyFilePath = storage_path('app/public/video/aes/download_' . $file);
+                $key = $data->video_key;
+                $iv = $data->video_iv;
             }
 
             File::copy($filePath, $copyFilePath);
 
-            $this->AESDecrypt($copyFilePath, 1);
+            $this->AESDecrypt($copyFilePath, $key, $iv, 1);
             $downloadFilePath = $copyFilePath;
 
             return response()->download($downloadFilePath)->deleteFileAfterSend(true);
@@ -294,12 +347,12 @@ class HomeController extends Controller
         }
     }
 
-    public function AESencrypt($data, $is_file)
+    public function AESencrypt($data, $key, $iv, $is_file)
     {
         if ($is_file == 1) $plaintext = file_get_contents($data);
         else $plaintext = $data;
 
-        $ciphertext = Crypt::encryptString($plaintext); // AES-256 CBC
+        $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, 0, $iv); // AES-256 CBC
 
         if ($is_file == 1) file_put_contents($data, $ciphertext);
         else return $ciphertext;
@@ -347,14 +400,17 @@ class HomeController extends Controller
         else return $ciphertext;
     }
 
-    public function AESdecrypt($data, $is_file) {
+    public function AESdecrypt($data, $key, $iv, $is_file) {
+
+        $key = base64_decode($key);
+        $iv = base64_decode($iv);
         if ($is_file == 1) $ciphertext = file_get_contents($data);
         else $ciphertext = $data;
 
         // Start calculating usage statistics
         $start_usage = getrusage();
 
-        $plaintext = Crypt::decryptString($ciphertext);
+        $plaintext = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
 
         // Stop calculating usage statistics
         $end_usage = getrusage();
