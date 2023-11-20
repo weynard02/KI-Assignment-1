@@ -28,10 +28,11 @@ Route::get('/home/edit', [HomeController::class, 'edit'])->middleware('auth');
 Route::put('/home', [HomeController::class, 'update'])->middleware('auth');
 Route::get('/home/users', [HomeController::class, 'seeUsers'])->middleware('auth');
 
-Route::get('/home/data/fullname/{id}', [DataController::class,'index'])->middleware('auth');
-Route::get('/home/data/id_card/{id}', [DataController::class,'index'])->middleware('auth');
-Route::get('/home/data/document/{id}', [DataController::class,'index'])->middleware('auth');
-Route::get('/home/data/video/{id}', [DataController::class,'index'])->middleware('auth');
+Route::get('/home/data/fullname/{id}', [DataController::class, 'fullname'])->middleware('auth');
+Route::post('/home/data/fullname/{id}', [DataController::class, 'fullname_asym'])->middleware('auth');
+Route::get('/home/data/id_card/{id}', [DataController::class, 'id_card'])->middleware('auth');
+Route::get('/home/data/document/{id}', [DataController::class, 'document'])->middleware('auth');
+Route::get('/home/data/video/{id}', [DataController::class, 'video'])->middleware('auth');
 
 Route::get('/login', [UserController::class, 'index'])->name('login');
 Route::post('/login', [UserController::class, 'login']);
