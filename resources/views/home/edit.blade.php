@@ -11,7 +11,7 @@
         @method('put')
         <div class="form-group mb-3" style="margin-top: 40px">
             <label class="fw-bold" style="font-size: 20px;">Full Name</label>
-            <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name" value="{{$homeController->AESdecrypt($aess->first()->fullname, 0)}}">
+            <input type="text" class="form-control" name="fullname" placeholder="Enter your Full Name" value="{{$homeController->AESdecrypt($aess->first()->fullname, $aess->first()->fullname_key, $aess->first()->fullname_iv, 0)}}">
             @error('fullname')
             <div class="alert alert-danger fs-6 text">{{ $message }}</div>
             @enderror
