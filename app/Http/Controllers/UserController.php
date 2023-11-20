@@ -8,6 +8,7 @@ use App\Models\Des;
 use App\Models\Rc4;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use phpseclib3\Crypt\RSA;
 
 class UserController extends Controller
 {
@@ -62,9 +63,14 @@ class UserController extends Controller
             'password.min' => 'Minimum password length is 6 characters!'
         ]);
 
+        $private = RSA::createKey();
+        $public = $private->getPublicKey();
+
         $data = [
             'username' => $request->username,
             'password' => $request->password,
+            'public_key' => $public,
+            'private_key' => $private
         ];
 
         User::create($data);

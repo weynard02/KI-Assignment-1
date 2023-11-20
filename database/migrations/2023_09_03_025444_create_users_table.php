@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('password');
+            $table->longText('public_key');
+            $table->longText('private_key');
             $table->rememberToken();
             $table->timestamps();
         });
