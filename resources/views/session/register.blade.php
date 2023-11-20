@@ -19,6 +19,15 @@
                     @enderror
                 </div>
 
+                <!-- Email-->
+                <div class="form-outline mb-4">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" placeholder="Email" name="email"/>
+                    @error('email')
+                    <div class="alert alert-danger fs-6 text">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Password input -->
                 <div class="form-outline mb-4">
                     <label class="form-label">Password</label>

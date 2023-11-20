@@ -26,10 +26,10 @@
                             <h4 class="h5">{{$username->username}}</h4>
                         </div>
                         <div class="col-sm-6 text-lg-end m-auto">
-                            <a href="/home/data/fullname/{{$username->id}}" class="btn btn-primary stretched-link">See Fullname</a>
-                            <a href="/home/data/id_card/{{$username->id}}" class="btn btn-primary stretched-link">See ID Card</a>
-                            <a href="/home/data/document/{{$username->id}}" class="btn btn-primary stretched-link">See Document</a>
-                            <a href="/home/data/video/{{$username->id}}" class="btn btn-primary stretched-link">See video</a>
+                            <a href="/home/data/fullname/{{$username->id}}" class="btn btn-primary">See Fullname</a>
+                            <a href="/home/data/id_card/{{$username->id}}" class="btn btn-primary">See ID Card</a>
+                            <a href="/home/data/document/{{$username->id}}" class="btn btn-primary">See Document</a>
+                            <a href="/home/data/video/{{$username->id}}" class="btn btn-primary">See video</a>
                         </div>
                     </div>
                 </div>

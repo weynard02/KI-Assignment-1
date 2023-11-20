@@ -54,11 +54,14 @@ class UserController extends Controller
     public function create(Request $request){
         $request->validate([
             'username' => 'required|unique:users,username',
+            'email' => 'required|unique:users|email',
             'password' => 'required|min:6'
         ], 
         [
             'username.required' => 'Username can\'t be empty!',
             'username.unique' => 'Username is already taken!',
+            'email.required' => 'Email can\'t be empty!',
+            'email.unique' => 'Email is already taken!',
             'password.required' => 'Password can\'t be empty!',
             'password.min' => 'Minimum password length is 6 characters!'
         ]);
@@ -68,6 +71,7 @@ class UserController extends Controller
 
         $data = [
             'username' => $request->username,
+            'email' => $request->email,
             'password' => $request->password,
             'public_key' => $public,
             'private_key' => $private
