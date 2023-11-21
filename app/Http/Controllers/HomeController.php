@@ -260,7 +260,7 @@ class HomeController extends Controller
         return redirect('/home');
     }
 
-    public function download($algo, $type, $id) {
+    public function download($algo, $type, $id, $akey) {
         if ($algo == 'aes') {
             $data = Aes::findorfail($id);
             $key = $data->fullname_key;
@@ -271,6 +271,7 @@ class HomeController extends Controller
                 $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
                 $key = $data->id_card_key;
                 $iv = $data->id_card_iv;
+
             }
             else if ($type == 'document') {
                 $file = $data->document;
@@ -286,7 +287,7 @@ class HomeController extends Controller
                 $key = $data->video_key;
                 $iv = $data->video_iv;
             }
-
+            if ($akey == $key) return 403;
             File::copy($filePath, $copyFilePath);
 
             $this->AESDecrypt($copyFilePath, $key, $iv, 1);

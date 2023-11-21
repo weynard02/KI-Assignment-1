@@ -27,15 +27,23 @@
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>ID Card</h6>
-                                        <a href="/download/aes/id_card/{{$aes->id}}" class="btn btn-primary btn-sm">Download</a>
+                                        @php
+                                         $akey = $aes->id_card_key;
+                                         $akey = str_replace('/', '', $akey);
+                                         $bkey = $aes->document_key;
+                                         $bkey = str_replace('/', '', $bkey);
+                                         $ckey = $aes->video_key;
+                                         $ckey = str_replace('/', '', $ckey);
+                                        @endphp
+                                        <a href="/download/aes/id_card/{{$aes->id}}/{{$akey}}" class="btn btn-primary btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Document</h6>
-                                        <a href="/download/aes/document/{{$aes->id}}" class="btn btn-primary btn-sm">Download</a>
+                                        <a href="/download/aes/document/{{$aes->id}}/{{$bkey}}" class="btn btn-primary btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Video</h6>
-                                        <a href="/download/aes/video/{{$aes->id}}" class="btn btn-primary btn-sm">Download</a>
+                                        <a href="/download/aes/video/{{$aes->id}}/{{$ckey}}" class="btn btn-primary btn-sm">Download</a>
                                     </div>
                                     @endforeach
                                 </div>
@@ -49,15 +57,19 @@
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>ID Card</h6>
-                                        <a href="/download/rc4/id_card/{{$rc4->id}}" class="btn btn-secondary btn-sm">Download</a>
+                                        @php
+                                            $dkey = $rc4->key;
+                                            $dkey = str_replace('/', '', $dkey);
+                                        @endphp
+                                        <a href="/download/rc4/id_card/{{$rc4->id}}/{{$dkey}}" class="btn btn-secondary btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Document</h6>
-                                        <a href="/download/rc4/document/{{$rc4->id}}" class="btn btn-secondary btn-sm">Download</a>
+                                        <a href="/download/rc4/document/{{$rc4->id}}/{{$dkey}}" class="btn btn-secondary btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Video</h6>
-                                        <a href="/download/rc4/video/{{$rc4->id}}" class="btn btn-secondary btn-sm">Download</a>
+                                        <a href="/download/rc4/video/{{$rc4->id}}/{{$dkey}}" class="btn btn-secondary btn-sm">Download</a>
                                     </div>
                                     @endforeach
                                 </div>
@@ -71,15 +83,19 @@
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>ID Card</h6>
-                                        <a href="/download/des/id_card/{{$des->id}}" class="btn btn-success btn-sm">Download</a>
+                                        @php
+                                            $ekey = $des->key;
+                                            $ekey = str_replace('/', '', $ekey);
+                                        @endphp
+                                        <a href="/download/des/id_card/{{$des->id}}/{{$ekey}}" class="btn btn-success btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Document</h6>
-                                        <a href="/download/des/document/{{$des->id}}" class="btn btn-success btn-sm">Download</a>
+                                        <a href="/download/des/document/{{$des->id}}/{{$ekey}}" class="btn btn-success btn-sm">Download</a>
                                     </div>
                                     <div class="col-3 mb-3">
                                         <h6>Video</h6>
-                                        <a href="/download/des/video/{{$des->id}}" class="btn btn-success btn-sm">Download</a>
+                                        <a href="/download/des/video/{{$des->id}}/{{$ekey}}" class="btn btn-success btn-sm">Download</a>
                                     </div>
                                     @endforeach
                                 </div>
