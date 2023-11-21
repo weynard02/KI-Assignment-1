@@ -287,7 +287,8 @@ class HomeController extends Controller
                 $key = $data->video_key;
                 $iv = $data->video_iv;
             }
-            if ($akey == $key) return 403;
+            $checkKey = str_replace('/', '', $key);
+            if ($akey != $checkKey) return abort('403');
             File::copy($filePath, $copyFilePath);
 
             $this->AESDecrypt($copyFilePath, $key, $iv, 1);
