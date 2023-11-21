@@ -315,6 +315,9 @@ class HomeController extends Controller
                 $copyFilePath = storage_path('app/public/video/des/download_' . $file);
             }
 
+            $checkKey = str_replace('/', '', $data->key);
+            if ($akey != $checkKey) return abort('403');
+
             File::copy($filePath, $copyFilePath);
 
             $this->Desdecrypt($copyFilePath, $data->key, $data->iv, 1);
@@ -339,7 +342,9 @@ class HomeController extends Controller
                 $filePath = storage_path('app/public/video/rc4/' . $file);
                 $copyFilePath = storage_path('app/public/video/rc4/download_' . $file);
             }
-
+            $checkKey = str_replace('/', '', $data->key);
+            if ($akey != $checkKey) return abort('403');
+            
             File::copy($filePath, $copyFilePath);
 
             $this->Rc4decrypt($copyFilePath, $data->key, 1);
