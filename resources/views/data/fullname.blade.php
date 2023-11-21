@@ -2,7 +2,6 @@
 @include('navbar')
 @php
     $homeController = app('App\Http\Controllers\HomeController');
-    $aes = $aess->first();
 @endphp
 @section('content')
 <div class="container">
@@ -56,7 +55,7 @@
 
                     <div class="form-group mb-2 p-2 d-block visually-hidden" id="hiddendata">
                         <label class="fw-bold mb-2" style="font-size: 20px;">Here is {{$user->username}}'s fullname</label>
-                        <p class="text-muted">{{ $homeController->AESdecrypt($aes->fullname, $aes->fullname_key, $aes->fullname_iv, 0) }}</p>
+                        <p class="text-muted">{{ $homeController->AESdecrypt($aesuser->fullname, $aesuser->fullname_key, $aesuser->fullname_iv, 0) }}</p>
                     </div>
                 </div>
             </div>
