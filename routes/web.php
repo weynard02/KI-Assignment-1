@@ -48,7 +48,7 @@ Route::post('/register', [UserController::class, 'create']);
 
 Route::get('/download/{algo}/{type}/{id}/{akey}', [HomeController::class, 'download'])->middleware('auth');
 
-Route::post('/mail/fullname/{key}', [MailController::class, 'encrypt_fullname'])->name('mail.fullname');
-Route::post('/mail/idcard/{key}', [MailController::class, 'encrypt_idcard'])->name('mail.idcard');
-Route::post('/mail/document/{key}', [MailController::class, 'encrypt_document'])->name('mail.document');
-Route::post('/mail/video/{key}', [MailController::class, 'encrypt_video'])->name('mail.video');
+Route::post('/mail/fullname/{main_key}/{client_key}', [MailController::class, 'encrypt_fullname'])->name('mail.fullname');
+Route::post('/mail/idcard/{main_key}/{client_key}', [MailController::class, 'encrypt_idcard'])->name('mail.idcard');
+Route::post('/mail/document/{main_key}/{client_key}', [MailController::class, 'encrypt_document'])->name('mail.document');
+Route::post('/mail/video/{main_key}/{client_key}', [MailController::class, 'encrypt_video'])->name('mail.video');

@@ -27,7 +27,7 @@
                         </div>
                         <div class="col-sm-6 text-lg-end m-auto">
                             <h5>{{$inbox->type}}</h5>
-                            <form action="{{ route('mail.'.$inbox->type, ['key' => $inbox->mainUser->id]) }}" method="post" enctype="multipart/form-data">
+                            <form action="{{ route('mail.'.$inbox->type, ['main_key' => $inbox->mainUser->id,'client_key' => $inbox->clientUser->id]) }}" method="post" enctype="multipart/form-data">
                                 @csrf
                                 <button type="submit" class="btn btn-success">Accept</button>
                             </form>
