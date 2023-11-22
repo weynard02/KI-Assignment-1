@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Aes;
 use App\Models\Des;
 use App\Models\Rc4;
+use App\Models\UserInbox;
 use App\Http\Controllers\HomeController\Rc4encrypt;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
@@ -27,6 +28,22 @@ class HomeController extends Controller
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $usernames = User::select('id', 'username')->get();
         return view('home.users', compact('usernames', 'aess'));
+    }
+
+    public function inbox() {
+        $aess = Aes::where('user_id', Auth::user()->id)->get();
+        $inboxes = UserInbox::where('main_user_id', Auth::user()->id)
+        ->where('is_acc', false)->get();
+        return view('home.inbox', compact('aess', 'inboxes'));
+    }
+
+    public function store_inbox(Request $request, $algo, $id) {
+        UserInbox::create([
+            'main_user_id' => $id,
+            'client_user_id' => Auth::user()->id,
+            'type' => $algo
+        ]);
+        return redirect()->back();
     }
 
     public function create()

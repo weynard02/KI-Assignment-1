@@ -28,6 +28,8 @@ Route::post('/home', [HomeController::class, 'store'])->middleware('auth');
 Route::get('/home/edit', [HomeController::class, 'edit'])->middleware('auth');
 Route::put('/home', [HomeController::class, 'update'])->middleware('auth');
 Route::get('/home/users', [HomeController::class, 'seeUsers'])->middleware('auth');
+Route::get('/home/inbox', [HomeController::class, 'inbox'])->middleware('auth');
+Route::post('/home/inbox/{algo}/{id}', [HomeController::class, 'store_inbox'])->middleware('auth');
 
 Route::get('/home/data/fullname/{id}', [DataController::class, 'fullname'])->middleware('auth');
 Route::post('/home/data/fullname/{id}', [DataController::class, 'fullname_asym'])->middleware('auth');
