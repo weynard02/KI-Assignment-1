@@ -8,7 +8,7 @@
     <div class="text-center mb-5" style="margin-top: 100px">
         <!-- Center the content -->
         <div class="col">
-            <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">{{$user->username}}'s fullname</h1>
+            <h1 class="text-center display-5 fw-bold" style="margin-top: 100px">{{$user->username}}'s video</h1>
             <br />
         </div>
     </div>
@@ -38,14 +38,14 @@
                 <div class="d-flex flex-column">
                     <div class="form-group mb-3 p-2">
                         <label class="fw-bold mb-3" style="font-size: 20px;">Symmetric Key</label>
-                        <input type="hidden" class="form-control" id="realsymkey" value="{{$aesuser->fullname_key}}">
+                        <input type="hidden" class="form-control" id="realsymkey" value="{{$aesuser->video_key}}">
                         <textarea id="symkey" rows="5" class="form-control" name="symkey" placeholder="Enter the symmetric key" value=""></textarea>
                     </div>
 
                     <div class="d-flex justify-content-end mb-5">
                         <button id="submitButton2" class="btn btn-dark mx-2" type="submit">Submit</button>
                     </div>
-                    <form action="{{ route('mail.fullname', ['key' => $user->id]) }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('mail.video', ['key' => $user->id]) }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-5 p-2 d-flex justify-content-between align-items-center">
                             <label class="fw-bold mb-3" style="font-size: 20px;">Not requested yet?</label>
@@ -54,8 +54,12 @@
                     </form>
 
                     <div class="form-group mb-2 p-2 d-block visually-hidden" id="hiddendata">
-                        <label class="fw-bold mb-2" style="font-size: 20px;">Here is {{$user->username}}'s fullname</label>
-                        <p class="text-muted">{{ $homeController->AESdecrypt($aesuser->fullname, $aesuser->fullname_key, $aesuser->fullname_iv, 0) }}</p>
+                        <label class="fw-bold mb-2" style="font-size: 20px;">Here is {{$user->username}}'s video</label>
+                        @php
+                            $ckey = $aesuser->video_key;
+                            $ckey = str_replace('/', '', $ckey);
+                        @endphp
+                        <a href="/download/aes/video/{{$aesuser->id}}/{{$ckey}}" class="btn btn-primary btn-sm">Download</a>
                     </div>
                 </div>
             </div>
@@ -69,7 +73,7 @@
 
         if (inputValue.trim() !== '') {
             $.ajax({
-                url: '/home/data/fullname/{{$user->id}}',
+                url: '/home/data/video/{{$user->id}}',
                 type: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',

@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MailController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +31,12 @@ Route::get('/home/users', [HomeController::class, 'seeUsers'])->middleware('auth
 
 Route::get('/home/data/fullname/{id}', [DataController::class, 'fullname'])->middleware('auth');
 Route::post('/home/data/fullname/{id}', [DataController::class, 'fullname_asym'])->middleware('auth');
-Route::get('/home/data/id_card/{id}', [DataController::class, 'id_card'])->middleware('auth');
-Route::get('/home/data/document/{id}', [DataController::class, 'document'])->middleware('auth');
-Route::get('/home/data/video/{id}', [DataController::class, 'video'])->middleware('auth');
+Route::get('/home/data/id_card/{id}', [DataController::class, 'idcardname'])->middleware('auth');
+Route::post('/home/data/id_card/{id}', [DataController::class, 'id_card_asym'])->middleware('auth');
+Route::get('/home/data/document/{id}', [DataController::class, 'documentname'])->middleware('auth');
+Route::post('/home/data/document/{id}', [DataController::class, 'document_asym'])->middleware('auth');
+Route::get('/home/data/video/{id}', [DataController::class, 'videoname'])->middleware('auth');
+Route::post('/home/data/video/{id}', [DataController::class, 'video_asym'])->middleware('auth');
 
 Route::get('/login', [UserController::class, 'index'])->name('login');
 Route::post('/login', [UserController::class, 'login']);
@@ -41,3 +45,8 @@ Route::get('/register', [UserController::class, 'register']);
 Route::post('/register', [UserController::class, 'create']);
 
 Route::get('/download/{algo}/{type}/{id}/{akey}', [HomeController::class, 'download'])->middleware('auth');
+
+Route::post('/mail/fullname/{key}', [MailController::class, 'encrypt_fullname'])->name('mail.fullname');
+Route::post('/mail/idcard/{key}', [MailController::class, 'encrypt_idcard'])->name('mail.idcard');
+Route::post('/mail/document/{key}', [MailController::class, 'encrypt_document'])->name('mail.document');
+Route::post('/mail/video/{key}', [MailController::class, 'encrypt_video'])->name('mail.video');
