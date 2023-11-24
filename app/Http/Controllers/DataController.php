@@ -23,6 +23,21 @@ class DataController extends Controller
 
         return $encrypted;
     }
+
+    public function decrypt_asym(Request $request){
+        $private = Auth::user()->private_key;
+        $decrypted = null;
+        $success = openssl_private_decrypt(base64_decode($request->encsymkey), $decrypted, $private, OPENSSL_PKCS1_PADDING);
+
+        if ($success) {
+            $response = ['status' => 'success', 'decrypted' => $decrypted];
+        } else {
+            $response = ['status' => 'error', 'decrypted' => 'Failed to decrypt the symmetric key'];
+        }
+
+        return response()->json($response);
+    }
+
     public function fullname($id)
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
@@ -31,22 +46,7 @@ class DataController extends Controller
         return view('data.fullname', compact('aess', 'user', 'aesuser'));
     }
 
-    public function fullname_asym(Request $request)
-    {
-        $private = Auth::user()->private_key;
-        $decrypted = null;
-        $success = openssl_private_decrypt(base64_decode($request->encsymkey), $decrypted, $private, OPENSSL_PKCS1_PADDING);
-
-        if ($success) {
-            $response = ['status' => 'success', 'decrypted' => $decrypted];
-        } else {
-            $response = ['status' => 'error', 'decrypted' => 'Failed to decrypt the symmetric key'];
-        }
-
-        return response()->json($response);
-    }
-
-    public function idcardname($id)
+    public function idcard($id)
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
@@ -54,22 +54,7 @@ class DataController extends Controller
         return view('data.idcard', compact('aess', 'user', 'aesuser'));
     }
 
-    public function id_card_asym(Request $request)
-    {
-        $private = Auth::user()->private_key;
-        $decrypted = null;
-        $success = openssl_private_decrypt(base64_decode($request->encsymkey), $decrypted, $private, OPENSSL_PKCS1_PADDING);
-
-        if ($success) {
-            $response = ['status' => 'success', 'decrypted' => $decrypted];
-        } else {
-            $response = ['status' => 'error', 'decrypted' => 'Failed to decrypt the symmetric key'];
-        }
-
-        return response()->json($response);
-    }
-
-    public function documentname($id)
+    public function document($id)
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
@@ -77,54 +62,11 @@ class DataController extends Controller
         return view('data.document', compact('aess', 'user', 'aesuser'));
     }
 
-    public function document_asym(Request $request)
-    {
-        $private = Auth::user()->private_key;
-        $decrypted = null;
-        $success = openssl_private_decrypt(base64_decode($request->encsymkey), $decrypted, $private, OPENSSL_PKCS1_PADDING);
-
-        if ($success) {
-            $response = ['status' => 'success', 'decrypted' => $decrypted];
-        } else {
-            $response = ['status' => 'error', 'decrypted' => 'Failed to decrypt the symmetric key'];
-        }
-
-        return response()->json($response);
-    }
-
-    public function videoname($id)
+    public function video($id)
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
         $aesuser = Aes::where('id', $id)->first();
         return view('data.video', compact('aess', 'user', 'aesuser'));
-    }
-
-    public function video_asym(Request $request)
-    {
-        $private = Auth::user()->private_key;
-        $decrypted = null;
-        $success = openssl_private_decrypt(base64_decode($request->encsymkey), $decrypted, $private, OPENSSL_PKCS1_PADDING);
-
-        if ($success) {
-            $response = ['status' => 'success', 'decrypted' => $decrypted];
-        } else {
-            $response = ['status' => 'error', 'decrypted' => 'Failed to decrypt the symmetric key'];
-        }
-
-        return response()->json($response);
-    }
-
-    public function id_card()
-    {
-        return view('data.idcard');
-    }
-    public function document()
-    {
-        return view('data.document');
-    }
-    public function video()
-    {
-        return view('data.video');
     }
 }

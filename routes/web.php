@@ -32,13 +32,13 @@ Route::get('/home/inbox', [HomeController::class, 'inbox'])->middleware('auth');
 Route::post('/home/inbox/{algo}/{id}', [HomeController::class, 'store_inbox'])->middleware('auth');
 
 Route::get('/home/data/fullname/{id}', [DataController::class, 'fullname'])->middleware('auth');
-Route::post('/home/data/fullname/{id}', [DataController::class, 'fullname_asym'])->middleware('auth');
-Route::get('/home/data/id_card/{id}', [DataController::class, 'idcardname'])->middleware('auth');
-Route::post('/home/data/id_card/{id}', [DataController::class, 'id_card_asym'])->middleware('auth');
-Route::get('/home/data/document/{id}', [DataController::class, 'documentname'])->middleware('auth');
-Route::post('/home/data/document/{id}', [DataController::class, 'document_asym'])->middleware('auth');
-Route::get('/home/data/video/{id}', [DataController::class, 'videoname'])->middleware('auth');
-Route::post('/home/data/video/{id}', [DataController::class, 'video_asym'])->middleware('auth');
+Route::get('/home/data/id_card/{id}', [DataController::class, 'idcard'])->middleware('auth');
+Route::get('/home/data/document/{id}', [DataController::class, 'document'])->middleware('auth');
+Route::get('/home/data/video/{id}', [DataController::class, 'video'])->middleware('auth');
+Route::post('/home/data/fullname/{id}', [DataController::class, 'decrypt_asym'])->middleware('auth');
+Route::post('/home/data/id_card/{id}', [DataController::class, 'decrypt_asym'])->middleware('auth');
+Route::post('/home/data/document/{id}', [DataController::class, 'decrypt_asym'])->middleware('auth');
+Route::post('/home/data/video/{id}', [DataController::class, 'decrypt_asym'])->middleware('auth');
 
 Route::get('/login', [UserController::class, 'index'])->name('login');
 Route::post('/login', [UserController::class, 'login']);
