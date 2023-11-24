@@ -280,12 +280,25 @@ class HomeController extends Controller
         return redirect('/home');
     }
 
-    public function download($algo, $type, $id, $akey) {
+    public function download($algo, $type, int $id, $akey) {
+        if ($type == 'id_card') $type = 'idcard';
+        $isAcc = UserInbox::where('main_user_id', $id)
+        ->where('client_user_id', Auth::user()->id)
+        ->where('type', $type)
+        ->where('is_acc', true)->get();
+        
+        if ((!$isAcc || count($isAcc) < 1) && $id !== Auth::user()->id) return abort('403');
+        else {
+            UserInbox::where('main_user_id', $id)
+            ->where('client_user_id', Auth::user()->id)
+            ->where('type', $type)
+            ->where('is_acc', true)->delete();
+        }
         if ($algo == 'aes') {
             $data = Aes::findorfail($id);
             $key = $data->fullname_key;
             $iv = $data->fullname_iv;
-            if ($type == 'id_card') {
+            if ($type == 'idcard') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/aes/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
@@ -319,7 +332,7 @@ class HomeController extends Controller
 
         else if ($algo == 'des') {
             $data = Des::findorfail($id);
-            if ($type == 'id_card') {
+            if ($type == 'idcard') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/des/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/des/download_' . $file);
@@ -347,7 +360,7 @@ class HomeController extends Controller
         }
         else if($algo == 'rc4') {
             $data = Rc4::findorfail($id);
-            if ($type == 'id_card') {
+            if ($type == 'idcard') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/rc4/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/rc4/download_' . $file);
