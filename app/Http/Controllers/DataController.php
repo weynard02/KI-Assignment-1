@@ -42,7 +42,7 @@ class DataController extends Controller
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
-        $aesuser = Aes::where('id', $id)->first();
+        $aesuser = Aes::where('user_id', $id)->first();
         return view('data.fullname', compact('aess', 'user', 'aesuser'));
     }
 
@@ -50,7 +50,7 @@ class DataController extends Controller
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
-        $aesuser = Aes::where('id', $id)->first();
+        $aesuser = Aes::where('user_id', $id)->first();
         return view('data.idcard', compact('aess', 'user', 'aesuser'));
     }
 
@@ -58,7 +58,7 @@ class DataController extends Controller
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
-        $aesuser = Aes::where('id', $id)->first();
+        $aesuser = Aes::where('user_id', $id)->first();
         return view('data.document', compact('aess', 'user', 'aesuser'));
     }
 
@@ -66,7 +66,7 @@ class DataController extends Controller
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $user = User::where('id', $id)->first();
-        $aesuser = Aes::where('id', $id)->first();
+        $aesuser = Aes::where('user_id', $id)->first();
         return view('data.video', compact('aess', 'user', 'aesuser'));
     }
 }

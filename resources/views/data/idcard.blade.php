@@ -46,7 +46,7 @@
                         <button id="submitButton2" class="btn btn-dark mx-2" type="submit">Submit</button>
                     </div>
                     {{-- {{ route('mail.idcard', ['key' => $user->id]) }} --}}
-                    <form action="/home/inbox/idcard/{{$aesuser->id}}" method="post" enctype="multipart/form-data">
+                    <form action="/home/inbox/idcard/{{$aesuser->user_id}}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-5 p-2 d-flex justify-content-between align-items-center">
                             <label class="fw-bold mb-3" style="font-size: 20px;">Not requested yet?</label>

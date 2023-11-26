@@ -24,7 +24,7 @@ class MailController extends Controller
         $requesting_user = User::find($requesting_id);
         $public_key = $requesting_user->public_key;
         
-        $requested_user = AES::find($requested_id);
+        $requested_user = AES::where('user_id', $requested_id)->first();
         $fullname_id = $requested_user->fullname_key;
         $encrypted = null;
         $this->accRequest($requested_id, $requesting_id, 'fullname');
@@ -43,7 +43,7 @@ class MailController extends Controller
         $requesting_user = User::find($requesting_id);
         $public_key = $requesting_user->public_key;
         
-        $requested_user = AES::find($requested_id);
+        $requested_user = AES::where('user_id', $requested_id)->first();
         $id_card_id = $requested_user->id_card_key;
         $encrypted = null;
 
@@ -63,7 +63,7 @@ class MailController extends Controller
         $requesting_user = User::find($requesting_id);
         $public_key = $requesting_user->public_key;
         
-        $requested_user = AES::find($requested_id);
+        $requested_user = AES::where('user_id', $requested_id)->first();
         $document_id = $requested_user->document_key;
         $encrypted = null;
 
@@ -83,7 +83,7 @@ class MailController extends Controller
         $requesting_user = User::find($requesting_id);
         $public_key = $requesting_user->public_key;
         
-        $requested_user = AES::find($requested_id);
+        $requested_user = AES::where('user_id', $requested_id)->first();
         $video_id = $requested_user->video_key;
         $encrypted = null;
 
