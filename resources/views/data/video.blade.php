@@ -69,12 +69,11 @@ $homeController = app('App\Http\Controllers\HomeController');
                         }
                         @endphp
 
-                        @if($ckey !== null){
+                        @if($ckey !== null)
                         <a href="/download/aes/video/{{ $aesuser->user_id }}/{{ $ckey }}"
                             class="btn btn-primary btn-sm">
                             Download
                         </a>
-                        }
                         @endif
                     </div>
                 </div>

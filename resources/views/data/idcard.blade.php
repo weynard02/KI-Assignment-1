@@ -71,12 +71,11 @@ $homeController = app('App\Http\Controllers\HomeController');
                         }
                         @endphp
 
-                        @if($akey !== null){
+                        @if($akey !== null)
                         <a href="/download/aes/id_card/{{ $aesuser->user_id }}/{{ $akey }}"
                             class="btn btn-primary btn-sm">
                             Download
                         </a>
-                        }
                         @endif
                     </div>
                 </div>
