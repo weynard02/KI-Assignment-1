@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 
+
 class HomeController extends Controller
 {
     public function index()
@@ -24,27 +25,33 @@ class HomeController extends Controller
         return view('home.index', compact('dess', 'rc4s', 'aess'));
     }
 
-    public function seeUsers() {
+    public function seeUsers()
+    {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $usernames = User::select('users.id', 'users.username')
-                            ->join('aes', 'users.id', '=', 'aes.user_id')
-                            ->where('users.id', '!=', Auth::user()->id)
-                            ->get();
+            ->join('aes', 'users.id', '=', 'aes.user_id')
+            ->where('users.id', '!=', Auth::user()->id)
+            ->get();
         return view('home.users', compact('usernames', 'aess'));
     }
 
-    public function inbox() {
+    public function inbox()
+    {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
         $inboxes = UserInbox::where('main_user_id', Auth::user()->id)
-        ->where('is_acc', false)->get();
+            ->where('is_acc', false)->get();
         return view('home.inbox', compact('aess', 'inboxes'));
     }
 
-    public function store_inbox(Request $request, $algo, $id) {
+    public function store_inbox(Request $request, $algo, $id)
+    {
         UserInbox::create([
             'main_user_id' => $id,
             'client_user_id' => Auth::user()->id,
-            'type' => $algo
+            'type' => $algo,
+            'sym_key' => null,
+            'iv' => null,
+            'encrypted_data' => null,
         ]);
         return redirect()->back();
     }
@@ -52,7 +59,8 @@ class HomeController extends Controller
     public function create()
     {
         $aess = Aes::where('user_id', Auth::user()->id)->get();
-        if (!$aess->isEmpty()) return redirect('/home/edit');
+        if (!$aess->isEmpty())
+            return redirect('/home/edit');
         return view('home.create', compact('aess'));
     }
 
@@ -280,76 +288,110 @@ class HomeController extends Controller
         return redirect('/home');
     }
 
-    public function download($algo, $type, int $id, $akey) {
-        if ($type == 'id_card') $type = 'idcard';
+    public function download($algo, $type, int $id, $akey)
+    {
+        // if($is_inbox)
+        if ($type == 'id_card')
+            $type = 'idcard';
         $isAcc = UserInbox::where('main_user_id', $id)
-        ->where('client_user_id', Auth::user()->id)
-        ->where('type', $type)
-        ->where('is_acc', true)->get();
-        
-        if ((!$isAcc || count($isAcc) < 1) && $id !== Auth::user()->id) return abort('403');
-        else {
-            UserInbox::where('main_user_id', $id)
             ->where('client_user_id', Auth::user()->id)
-            ->where('type', $type)
-            ->where('is_acc', true)->delete();
+            ->where('type', $type)->get();
+        // dd($type);
+
+        if ((!$isAcc || count($isAcc) < 1) && $id !== Auth::user()->id) {
+            return abort('403');
         }
+
         if ($algo == 'aes') {
-            $data = Aes::findorfail($id);
-            $key = $data->fullname_key;
-            $iv = $data->fullname_iv;
-            if ($type == 'idcard') {
-                $file = $data->id_card;
-                $filePath = storage_path('app/public/id-card/aes/' . $file);
-                $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
-                $key = $data->id_card_key;
-                $iv = $data->id_card_iv;
+            // dd($isAcc);
+            if ($id == Auth::user()->id) {
+                $data = Aes::where('user_id', $id)->first();
+                $key = $data->fullname_key;
+                $iv = $data->fullname_iv;
+                if ($type == 'idcard') {
+                    $file = $data->id_card;
+                    $filePath = storage_path('app/public/id-card/aes/' . $file);
+                    $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
+                    $key = $data->id_card_key;
+                    $iv = $data->id_card_iv;
 
+                } else if ($type == 'document') {
+                    $file = $data->document;
+                    $filePath = storage_path('app/public/document/aes/' . $file);
+                    $copyFilePath = storage_path('app/public/document/aes/download_' . $file);
+                    $key = $data->document_key;
+                    $iv = $data->document_iv;
+                } else if ($type == 'video') {
+                    $file = $data->video;
+                    $filePath = storage_path('app/public/video/aes/' . $file);
+                    $copyFilePath = storage_path('app/public/video/aes/download_' . $file);
+                    $key = $data->video_key;
+                    $iv = $data->video_iv;
+                }
+                $checkKey = str_replace('/', '', $key);
+                if ($akey != $checkKey)
+                    return abort('403');
+                File::copy($filePath, $copyFilePath);
+
+                $this->AESDecrypt($copyFilePath, $key, $iv, 1);
+                $downloadFilePath = $copyFilePath;
+
+                return response()->download($downloadFilePath)->deleteFileAfterSend(true);
+            } else {
+                // dd($id);
+                $data = UserInbox::where('main_user_id', $id)
+                    ->where('client_user_id', Auth::user()->id)->where('type', $type)->first();
+                $key = $data->sym_key;
+                $iv = $data->iv;
+                if ($type == 'idcard') {
+                    $file = $data->encrypted_data;
+                    $filePath = storage_path('app/public/id-card/aes/request/request_' . $file);
+                    $copyFilePath = storage_path('app/public/id-card/aes/download_' . $file);
+                } else if ($type == 'document') {
+                    $file = $data->encrypted_data;
+                    $filePath = storage_path('app/public/document/aes/request/request_' . $file);
+                    $copyFilePath = storage_path('app/public/document/aes/download_' . $file);
+                } else if ($type == 'video') {
+                    $file = $data->encrypted_data;
+                    $filePath = storage_path('app/public/video/aes/request/request_' . $file);
+                    // dd($filePath);
+                    $copyFilePath = storage_path('app/public/video/aes/download_' . $file);
+                }
+                $checkKey = str_replace('/', '', $key);
+                // dd($checkKey, $akey);
+                if ($akey != $checkKey)
+                    return abort('403');
+                File::copy($filePath, $copyFilePath);
+
+                $this->AESDecrypt($copyFilePath, $key, $iv, 1);
+                $downloadFilePath = $copyFilePath;
+
+                UserInbox::where('main_user_id', $id)
+                    ->where('client_user_id', Auth::user()->id)
+                    ->where('type', $type)
+                    ->where('is_acc', true)->delete();
+
+                return response()->download($downloadFilePath)->deleteFileAfterSend(true);
             }
-            else if ($type == 'document') {
-                $file = $data->document;
-                $filePath = storage_path('app/public/document/aes/' . $file);
-                $copyFilePath = storage_path('app/public/document/aes/download_' . $file);
-                $key = $data->document_key;
-                $iv = $data->document_iv;
-            }
-            else if ($type == 'video') {
-                $file = $data->video;
-                $filePath = storage_path('app/public/video/aes/' . $file);
-                $copyFilePath = storage_path('app/public/video/aes/download_' . $file);
-                $key = $data->video_key;
-                $iv = $data->video_iv;
-            }
-            $checkKey = str_replace('/', '', $key);
-            if ($akey != $checkKey) return abort('403');
-            File::copy($filePath, $copyFilePath);
-
-            $this->AESDecrypt($copyFilePath, $key, $iv, 1);
-            $downloadFilePath = $copyFilePath;
-
-            return response()->download($downloadFilePath)->deleteFileAfterSend(true);
-        }
-
-        else if ($algo == 'des') {
-            $data = Des::findorfail($id);
+        } else if ($algo == 'des') {
+            $data = Des::where('user_id', $id)->first();
             if ($type == 'idcard') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/des/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/des/download_' . $file);
-            }
-            else if ($type == 'document') {
+            } else if ($type == 'document') {
                 $file = $data->document;
                 $filePath = storage_path('app/public/document/des/' . $file);
                 $copyFilePath = storage_path('app/public/document/des/download_' . $file);
-            }
-            else if ($type == 'video') {
+            } else if ($type == 'video') {
                 $file = $data->video;
                 $filePath = storage_path('app/public/video/des/' . $file);
                 $copyFilePath = storage_path('app/public/video/des/download_' . $file);
             }
 
             $checkKey = str_replace('/', '', $data->key);
-            if ($akey != $checkKey) return abort('403');
+            if ($akey != $checkKey)
+                return abort('403');
 
             File::copy($filePath, $copyFilePath);
 
@@ -357,27 +399,25 @@ class HomeController extends Controller
             $downloadFilePath = $copyFilePath;
 
             return response()->download($downloadFilePath)->deleteFileAfterSend(true);
-        }
-        else if($algo == 'rc4') {
-            $data = Rc4::findorfail($id);
+        } else if ($algo == 'rc4') {
+            $data = Rc4::where('user_id', $id)->first();
             if ($type == 'idcard') {
                 $file = $data->id_card;
                 $filePath = storage_path('app/public/id-card/rc4/' . $file);
                 $copyFilePath = storage_path('app/public/id-card/rc4/download_' . $file);
-            }
-            else if ($type == 'document') {
+            } else if ($type == 'document') {
                 $file = $data->document;
                 $filePath = storage_path('app/public/document/rc4/' . $file);
                 $copyFilePath = storage_path('app/public/document/rc4/download_' . $file);
-            }
-            else if ($type == 'video') {
+            } else if ($type == 'video') {
                 $file = $data->video;
                 $filePath = storage_path('app/public/video/rc4/' . $file);
                 $copyFilePath = storage_path('app/public/video/rc4/download_' . $file);
             }
             $checkKey = str_replace('/', '', $data->key);
-            if ($akey != $checkKey) return abort('403');
-            
+            if ($akey != $checkKey)
+                return abort('403');
+
             File::copy($filePath, $copyFilePath);
 
             $this->Rc4decrypt($copyFilePath, $data->key, 1);
@@ -389,19 +429,25 @@ class HomeController extends Controller
 
     public function AESencrypt($data, $key, $iv, $is_file)
     {
-        if ($is_file == 1) $plaintext = file_get_contents($data);
-        else $plaintext = $data;
+        if ($is_file == 1)
+            $plaintext = file_get_contents($data);
+        else
+            $plaintext = $data;
 
         $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, 0, $iv); // AES-256 CBC
 
-        if ($is_file == 1) file_put_contents($data, $ciphertext);
-        else return $ciphertext;
+        if ($is_file == 1)
+            file_put_contents($data, $ciphertext);
+        else
+            return $ciphertext;
 
     }
     public function Rc4encrypt($data, $key, $is_file)
     {
-        if ($is_file == 1) $plaintext = file_get_contents($data);
-        else $plaintext = $data;
+        if ($is_file == 1)
+            $plaintext = file_get_contents($data);
+        else
+            $plaintext = $data;
         $len = strlen($key);
         $S = range(0, 255);
         $j = 0;
@@ -424,28 +470,37 @@ class HomeController extends Controller
         }
         $ciphertext = bin2hex($ciphertext);
 
-        if ($is_file == 1) file_put_contents($data, $ciphertext);
-        else return $ciphertext;
+        if ($is_file == 1)
+            file_put_contents($data, $ciphertext);
+        else
+            return $ciphertext;
     }
 
     public function Desencrypt($data, $key, $iv, $is_file)
     {
-        if ($is_file == 1) $plaintext = file_get_contents($data);
-        else $plaintext = $data;
+        if ($is_file == 1)
+            $plaintext = file_get_contents($data);
+        else
+            $plaintext = $data;
 
         $ciphertext = openssl_encrypt($plaintext, 'des-ede-cfb', $key, 0, $iv);
         $ciphertext = bin2hex($ciphertext);
 
-        if ($is_file == 1) file_put_contents($data, $ciphertext);
-        else return $ciphertext;
+        if ($is_file == 1)
+            file_put_contents($data, $ciphertext);
+        else
+            return $ciphertext;
     }
 
-    public function AESdecrypt($data, $key, $iv, $is_file) {
+    public function AESdecrypt($data, $key, $iv, $is_file)
+    {
 
         $key = base64_decode($key);
         $iv = base64_decode($iv);
-        if ($is_file == 1) $ciphertext = file_get_contents($data);
-        else $ciphertext = $data;
+        if ($is_file == 1)
+            $ciphertext = file_get_contents($data);
+        else
+            $ciphertext = $data;
 
         // Start calculating usage statistics
         $start_usage = getrusage();
@@ -468,13 +523,18 @@ class HomeController extends Controller
         $total_time = $user_time + $system_time;
         error_log("AES Decryption total time : " . $total_time . " second");
 
-        if ($is_file == 1) file_put_contents($data, $plaintext);
-        else return $plaintext;
+        if ($is_file == 1)
+            file_put_contents($data, $plaintext);
+        else
+            return $plaintext;
     }
 
-    public function Rc4decrypt($data, $key, $is_file) {
-        if ($is_file == 1) $ciphertext = file_get_contents($data);
-        else $ciphertext = $data;
+    public function Rc4decrypt($data, $key, $is_file)
+    {
+        if ($is_file == 1)
+            $ciphertext = file_get_contents($data);
+        else
+            $ciphertext = $data;
 
         // Start calculating usage statistics
         $start_usage = getrusage();
@@ -517,13 +577,18 @@ class HomeController extends Controller
         $total_time = $user_time + $system_time;
         error_log("RC4 Decryption total time : " . $total_time . " second");
 
-        if ($is_file == 1) file_put_contents($data, $plaintext);
-        else return $plaintext;
+        if ($is_file == 1)
+            file_put_contents($data, $plaintext);
+        else
+            return $plaintext;
     }
 
-    public function Desdecrypt($data, $key, $iv, $is_file) {
-        if ($is_file == 1) $ciphertext = file_get_contents($data);
-        else $ciphertext = $data;
+    public function Desdecrypt($data, $key, $iv, $is_file)
+    {
+        if ($is_file == 1)
+            $ciphertext = file_get_contents($data);
+        else
+            $ciphertext = $data;
 
         // Start calculating usage statistics
         $start_usage = getrusage();
@@ -550,7 +615,9 @@ class HomeController extends Controller
         $total_time = $user_time + $system_time;
         error_log("DES Decryption total time : " . $total_time . " second");
 
-        if ($is_file == 1) file_put_contents($data, $plaintext);
-        else return $plaintext;
+        if ($is_file == 1)
+            file_put_contents($data, $plaintext);
+        else
+            return $plaintext;
     }
 }

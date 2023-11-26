@@ -1,7 +1,7 @@
 @extends('master')
 @include('navbar')
 @php
-    $homeController = app('App\Http\Controllers\HomeController');
+$homeController = app('App\Http\Controllers\HomeController');
 @endphp
 @section('content')
 <div class="container">
@@ -19,7 +19,8 @@
                 <div class="d-flex flex-column">
                     <div class="form-group mb-3 p-2">
                         <label class="fw-bold mb-3" style="font-size: 20px;">Decrypt key from your email</label>
-                        <textarea id="encsymkey" rows="5" class="form-control" name="encsymkey" placeholder="Enter the key from your email" value=""></textarea>
+                        <textarea id="encsymkey" rows="5" class="form-control" name="encsymkey"
+                            placeholder="Enter the key from your email" value=""></textarea>
                     </div>
 
                     <div class="d-flex justify-content-end mb-5">
@@ -38,15 +39,19 @@
                 <div class="d-flex flex-column">
                     <div class="form-group mb-3 p-2">
                         <label class="fw-bold mb-3" style="font-size: 20px;">Symmetric Key</label>
-                        <input type="hidden" class="form-control" id="realsymkey" value="{{$aesuser->video_key}}">
-                        <textarea id="symkey" rows="5" class="form-control" name="symkey" placeholder="Enter the symmetric key" value=""></textarea>
+                        @if($inbox !== null)
+                        <input type="hidden" class="form-control" id="realsymkey" value="{{$inbox->sym_key}}">
+                        @endif
+                        <textarea id="symkey" rows="5" class="form-control" name="symkey"
+                            placeholder="Enter the symmetric key" value=""></textarea>
                     </div>
 
                     <div class="d-flex justify-content-end mb-5">
                         <button id="submitButton2" class="btn btn-dark mx-2" type="submit">Submit</button>
                     </div>
                     {{-- {{ route('mail.video', ['key' => $user->id]) }} --}}
-                    <form action="/home/inbox/video/{{(int)$aesuser->user_id}}" method="post" enctype="multipart/form-data">
+                    <form action="/home/inbox/video/{{(int)$aesuser->user_id}}" method="post"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-5 p-2 d-flex justify-content-between align-items-center">
                             <label class="fw-bold mb-3" style="font-size: 20px;">Not requested yet?</label>
@@ -57,10 +62,20 @@
                     <div class="form-group mb-2 p-2 d-block visually-hidden" id="hiddendata">
                         <label class="fw-bold mb-2" style="font-size: 20px;">Here is {{$user->username}}'s video</label>
                         @php
-                            $ckey = $aesuser->video_key;
-                            $ckey = str_replace('/', '', $ckey);
+                        $ckey = null;
+
+                        if ($inbox !== null) {
+                        $ckey = str_replace('/', '', $inbox->sym_key);
+                        }
                         @endphp
-                        <a href="/download/aes/video/{{$aesuser->id}}/{{$ckey}}" class="btn btn-primary btn-sm">Download</a>
+
+                        @if($ckey !== null){
+                        <a href="/download/aes/video/{{ $aesuser->user_id }}/{{ $ckey }}"
+                            class="btn btn-primary btn-sm">
+                            Download
+                        </a>
+                        }
+                        @endif
                     </div>
                 </div>
             </div>
@@ -69,7 +84,7 @@
 </div>
 
 <script>
-    document.getElementById('submitButton1').addEventListener('click', function() {
+    document.getElementById('submitButton1').addEventListener('click', function () {
         var inputValue = document.getElementById('encsymkey').value;
 
         if (inputValue.trim() !== '') {
@@ -80,18 +95,18 @@
                     _token: '{{ csrf_token() }}',
                     encsymkey: inputValue
                 },
-                success: function(response) {
+                success: function (response) {
                     console.log(response);
                     document.getElementById('outputTextarea').value = response.decrypted;
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log(error);
                 }
             });
         }
     });
 
-    document.getElementById('submitButton2').addEventListener('click', function() {
+    document.getElementById('submitButton2').addEventListener('click', function () {
         var inputValue = document.getElementById('symkey').value;
         var realsymkey = document.getElementById('realsymkey').value;
         var hiddenDataDiv = document.getElementById('hiddendata');

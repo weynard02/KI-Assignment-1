@@ -10,7 +10,7 @@ class UserInbox extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['main_user_id', 'client_user_id', 'is_acc', 'type'];
+    protected $fillable = ['main_user_id', 'client_user_id', 'is_acc', 'type', 'sym_key', 'iv', 'encrypted_data'];
 
     public function mainUser(): BelongsTo
     {
