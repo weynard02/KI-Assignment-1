@@ -15,6 +15,7 @@ $homeController = app('App\Http\Controllers\HomeController');
                         style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem">
                         <img src="{{ url('img/profile_user.svg') }}" alt="Avatar" style="width: 150px" />
                         <h2 class="text-center fw-bold">{{ Auth::user()->username }}</h2>
+                        <a href="/sign/{{Auth::user()->id}}" class="btn btn-primary">Sign PDF</a>
                     </div>
                     <div class="col-md-8">
                         <div class="card-body p-4">

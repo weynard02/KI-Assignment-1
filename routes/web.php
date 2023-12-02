@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\PDFController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -52,3 +53,5 @@ Route::post('/mail/fullname/{main_key}/{client_key}', [MailController::class, 'e
 Route::post('/mail/idcard/{main_key}/{client_key}', [MailController::class, 'encrypt_idcard'])->name('mail.idcard');
 Route::post('/mail/document/{main_key}/{client_key}', [MailController::class, 'encrypt_document'])->name('mail.document');
 Route::post('/mail/video/{main_key}/{client_key}', [MailController::class, 'encrypt_video'])->name('mail.video');
+
+Route::get('/sign/{userId}', [PDFController::class, 'sign'])->middleware('auth');
