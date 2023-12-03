@@ -16,6 +16,11 @@ $homeController = app('App\Http\Controllers\HomeController');
                         <img src="{{ url('img/profile_user.svg') }}" alt="Avatar" style="width: 150px" />
                         <h2 class="text-center fw-bold">{{ Auth::user()->username }}</h2>
                         <a href="/sign/{{Auth::user()->id}}" class="btn btn-primary">Sign PDF</a>
+                        @if(session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div
+                        @endif
                     </div>
                     <div class="col-md-8">
                         <div class="card-body p-4">
