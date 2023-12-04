@@ -19,7 +19,12 @@ $homeController = app('App\Http\Controllers\HomeController');
                         @if(session('error'))
                         <div class="alert alert-danger" role="alert">
                             {{ session('error') }}
-                        </div
+                        </div>
+                        @endif
+                        @if(session('success'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('success') }}
+                        </div>
                         @endif
                     </div>
                     <div class="col-md-8">

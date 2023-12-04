@@ -64,11 +64,10 @@ class PDFController extends Controller
 
     
     public function sign($userId) {
-        if (!$userId->private_key && !$userId->public_key) {
+        $user = User::findorfail($userId);
+        if ($user->private_key == null && $user->public_key == null) {
             $this->generateKey($userId);
         }
-
-        $user = User::findorfail($userId);
         $userAes = AES::where('user_id', $userId)->first();
         $document = $userAes->document;
 
@@ -94,8 +93,15 @@ class PDFController extends Controller
 
         $success = openssl_private_encrypt($digest , $digitalSignature, $user->private_key, OPENSSL_PKCS1_PADDING);
 
-        
+        $digSigPath = storage_path('app/public/document/aes/' . $user->username . '_digital_signature');
 
+        File::put($digSigPath, $digitalSignature);
+        
+        $user->update([
+            'digital_signature' => $user->username . '_digital_signature',
+        ]);
+
+        return redirect()->back()->with('success', 'signed!');
     }
 
     public function verify($userId) {
