@@ -24,8 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'public_key',
-        'private_key',
-        'digital_signature'
+        'private_key'
     ];
 
     /**

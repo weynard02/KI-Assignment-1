@@ -101,14 +101,6 @@ class PDFController extends Controller
 
         $success = openssl_private_encrypt($digest , $digitalSignature, $user->private_key, OPENSSL_PKCS1_PADDING);
 
-        $digSigPath = storage_path('app/public/document/aes/' . $user->username . '_digital_signature');
-
-        File::put($digSigPath, $digitalSignature);
-        
-        $user->update([
-            'digital_signature' => $user->username . '_digital_signature',
-        ]);
-
         $data = $dehashedValue . '\n\n\nSignature:' . $digitalSignature;
 
 
