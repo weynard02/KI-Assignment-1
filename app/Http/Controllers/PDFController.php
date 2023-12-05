@@ -30,10 +30,7 @@ class PDFController extends Controller
 
         $key = base64_decode($key);
         $iv = base64_decode($iv);
-        if ($is_file == 1)
-            $ciphertext = file_get_contents($data);
-        else
-            $ciphertext = $data;
+        $ciphertext = file_get_contents($data);
 
         // Start calculating usage statistics
         $start_usage = getrusage();
@@ -56,6 +53,7 @@ class PDFController extends Controller
         $total_time = $user_time + $system_time;
         error_log("AES Decryption total time : " . $total_time . " second");
 
+
         if ($is_file == 1)
             file_put_contents($data, $plaintext);
         else
@@ -74,11 +72,10 @@ class PDFController extends Controller
         if (substr($document, -4) != ".pdf")
             return redirect()->back()->with('error', 'Your Document is not PDF');
 
+        // Storage::makeDirectory('public/document/aes/signing');
 
         $filePath = storage_path('app/public/document/aes/' . $document);
-        $copyfilePath = storage_path('app/public/document/aes/signing/pdf_' . $document);
-
-        Storage::makeDirectory('public/document/aes/signing');
+        $copyfilePath = storage_path('app/public/document/aes/pdf_' . $document);
 
         File::copy($filePath, $copyfilePath);
 
@@ -100,6 +97,8 @@ class PDFController extends Controller
         $user->update([
             'digital_signature' => $user->username . '_digital_signature',
         ]);
+
+       
 
         return redirect()->back()->with('success', 'signed!');
     }
