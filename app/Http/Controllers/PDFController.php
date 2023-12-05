@@ -24,7 +24,21 @@ class PDFController extends Controller
             'public_key' => $public
         ]);
     }
+    public function AESencrypt($data, $key, $iv, $is_file)
+    {
+       
+        $key = base64_decode($key);
+        $iv = base64_decode($iv);
+        $plaintext = file_get_contents($data);
 
+        $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, 0, $iv); // AES-256 CBC
+
+        if ($is_file == 1)
+            file_put_contents($data, $ciphertext);
+        else
+            return $ciphertext;
+
+    }
     public function AESdecrypt($data, $key, $iv, $is_file)
     {
 
@@ -75,15 +89,12 @@ class PDFController extends Controller
         // Storage::makeDirectory('public/document/aes/signing');
 
         $filePath = storage_path('app/public/document/aes/' . $document);
-        $copyfilePath = storage_path('app/public/document/aes/pdf_' . $document);
-
-        File::copy($filePath, $copyfilePath);
 
         $symKey = $userAes->document_key;
         $iv = $userAes->document_iv;
         
         //mengambil plaintext saja 
-        $dehashedValue = $this->AESdecrypt($copyfilePath, $symKey, $iv, 0);
+        $dehashedValue = $this->AESdecrypt($filePath, $symKey, $iv, 0);
 
         $digest = Hash::make($dehashedValue);
         $digitalSignature = null;
@@ -98,7 +109,12 @@ class PDFController extends Controller
             'digital_signature' => $user->username . '_digital_signature',
         ]);
 
-       
+        $data = $dehashedValue . '\n\n\nSignature:' . $digitalSignature;
+
+
+        file_put_contents($filePath, $data);
+
+        $this->AESencrypt($filePath, $symKey, $iv, 1);
 
         return redirect()->back()->with('success', 'signed!');
     }
