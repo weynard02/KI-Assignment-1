@@ -74,7 +74,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => $request->password,
             'public_key' => $public,
-            'private_key' => $private
+            'private_key' => $private,
+            'doc_is_signed' => 0
         ];
 
         User::create($data);

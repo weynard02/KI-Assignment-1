@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Hash;
 
 class PDFController extends Controller
 {
-    public function generateKey($userId) {
+    public function generateKey($userId)
+    {
         $private = RSA::createKey();
         $public = $private->getPublicKey();
 
@@ -26,7 +27,7 @@ class PDFController extends Controller
     }
     public function AESencrypt($data, $key, $iv, $is_file)
     {
-       
+
         $key = base64_decode($key);
         $iv = base64_decode($iv);
         $plaintext = file_get_contents($data);
@@ -37,7 +38,6 @@ class PDFController extends Controller
             file_put_contents($data, $ciphertext);
         else
             return $ciphertext;
-
     }
     public function AESdecrypt($data, $key, $iv, $is_file)
     {
@@ -74,9 +74,13 @@ class PDFController extends Controller
             return $plaintext;
     }
 
-    
-    public function sign($userId) {
+
+    public function sign($userId)
+    {
         $user = User::findorfail($userId);
+        if ($user->doc_is_signed) {
+            return redirect()->back()->with('error', 'already signed!');
+        }
         if ($user->private_key == null && $user->public_key == null) {
             $this->generateKey($userId);
         }
@@ -92,17 +96,20 @@ class PDFController extends Controller
 
         $symKey = $userAes->document_key;
         $iv = $userAes->document_iv;
-        
+
         //mengambil plaintext saja 
         $dehashedValue = $this->AESdecrypt($filePath, $symKey, $iv, 0);
 
-        $digest = Hash::make($dehashedValue);
+        // $digest = Hash::make($dehashedValue);
+        $digest = hash('sha256', $dehashedValue);
         $digitalSignature = null;
 
-        $success = openssl_private_encrypt($digest , $digitalSignature, $user->private_key, OPENSSL_PKCS1_PADDING);
+        $success = openssl_private_encrypt($digest, $digitalSignature, $user->private_key, OPENSSL_PKCS1_PADDING);
 
-        $data = $dehashedValue . '\n\n\nSignature:' . $digitalSignature;
+        $digitalSignature = base64_encode($digitalSignature);
+        $data = $dehashedValue . 'Signature:' . $digitalSignature;
 
+        $user->update(['doc_is_signed' => 1]);
 
         file_put_contents($filePath, $data);
 
@@ -111,7 +118,22 @@ class PDFController extends Controller
         return redirect()->back()->with('success', 'signed!');
     }
 
-    public function verify($userId) {
-        
+    public function verify(Request $request, $id)
+    {
+        $content = file_get_contents($request->file('document'));
+        $pos = strpos($content, 'Signature:');
+
+        if ($pos !== false) {
+            $doc = substr($content, 0, $pos);
+            $digsig = substr($content, $pos + strlen('Signature:'));
+            $digest = hash('sha256', $doc);
+            $public_key = User::findOrFail($id)->public_key;
+            $decrypted_digsig = null;
+            openssl_public_decrypt(base64_decode($digsig), $decrypted_digsig, $public_key, OPENSSL_PKCS1_PADDING);
+
+            return redirect()->back()->with(['status' => 'success', 'digest' => $digest, 'decrypted_digsig' => $decrypted_digsig]);
+        } else {
+            return redirect()->back()->with(['status' => 'failed', 'message' => 'Signature not found!']);
+        }
     }
 }

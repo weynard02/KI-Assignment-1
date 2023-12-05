@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->longText('public_key');
             $table->longText('private_key');
+            $table->boolean('doc_is_signed');
             $table->rememberToken();
             $table->timestamps();
         });

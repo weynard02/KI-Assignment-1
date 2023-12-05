@@ -55,3 +55,4 @@ Route::post('/mail/document/{main_key}/{client_key}', [MailController::class, 'e
 Route::post('/mail/video/{main_key}/{client_key}', [MailController::class, 'encrypt_video'])->name('mail.video');
 
 Route::get('/sign/{userId}', [PDFController::class, 'sign'])->middleware('auth');
+Route::post('/verify/{userId}', [PDFController::class, 'verify'])->middleware('auth');

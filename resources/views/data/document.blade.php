@@ -19,8 +19,7 @@ $homeController = app('App\Http\Controllers\HomeController');
                 <div class="d-flex flex-column">
                     <div class="form-group mb-3 p-2">
                         <label class="fw-bold mb-3" style="font-size: 20px;">Decrypt key from your email</label>
-                        <textarea id="encsymkey" rows="5" class="form-control" name="encsymkey"
-                            placeholder="Enter the key from your email" value=""></textarea>
+                        <textarea id="encsymkey" rows="5" class="form-control" name="encsymkey" placeholder="Enter the key from your email" value=""></textarea>
                     </div>
 
                     <div class="d-flex justify-content-end mb-5">
@@ -42,16 +41,14 @@ $homeController = app('App\Http\Controllers\HomeController');
                         @if($inbox !== null)
                         <input type="hidden" class="form-control" id="realsymkey" value="{{$inbox->sym_key}}">
                         @endif
-                        <textarea id="symkey" rows="5" class="form-control" name="symkey"
-                            placeholder="Enter the symmetric key" value=""></textarea>
+                        <textarea id="symkey" rows="5" class="form-control" name="symkey" placeholder="Enter the symmetric key" value=""></textarea>
                     </div>
 
                     <div class="d-flex justify-content-end mb-5">
                         <button id="submitButton2" class="btn btn-dark mx-2" type="submit">Submit</button>
                     </div>
                     {{-- {{ route('mail.document', ['key' => $user->id]) }} --}}
-                    <form action="/home/inbox/document/{{(int)$aesuser->user_id}}" method="post"
-                        enctype="multipart/form-data">
+                    <form action="/home/inbox/document/{{(int)$aesuser->user_id}}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group mb-5 p-2 d-flex justify-content-between align-items-center">
                             <label class="fw-bold mb-3" style="font-size: 20px;">Not requested yet?</label>
@@ -71,8 +68,7 @@ $homeController = app('App\Http\Controllers\HomeController');
                         @endphp
 
                         @if($bkey !== null)
-                        <a href="/download/aes/document/{{ $aesuser->user_id }}/{{ $bkey }}"
-                            class="btn btn-primary btn-sm">
+                        <a href="/download/aes/document/{{ $aesuser->user_id }}/{{ $bkey }}" class="btn btn-primary btn-sm">
                             Download
                         </a>
                         @endif
@@ -81,10 +77,51 @@ $homeController = app('App\Http\Controllers\HomeController');
             </div>
         </div>
     </div>
+    <div id="mycard" class="d-flex justify-content-center">
+        <div class="card mt-3 mb-5 col-lg-11 mx-3">
+            <div class="card-body">
+                <div class="d-flex flex-column">
+                    <form action="/verify/{{(int)$aesuser->user_id}}" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group mb-3 p-2">
+                            <label class="fw-bold mb-3" style="font-size: 20px;">Verify Document</label>
+                            <input type="file" class="form-control" name="document" required>
+                            @error('document')
+                            <div class="alert alert-danger fs-6 text">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button id="verifybutton" class="btn btn-dark mt-1" type="submit">Submit</button>
+                        </div>
+                    </form>
+
+                    @if(session('status') == 'success')
+                        <div class="d-flex mt-5">
+                            <div class="form-group col-6 mb-3 p-2">
+                                <label class="fw-bold mb-3" style="font-size: 20px;">Digest from Document</label>
+                                <textarea class="form-control" rows="2" readonly>{{session('digest')}}</textarea>
+                            </div>
+                            <div class="form-group col-6 mb-3 p-2">
+                                <label class="fw-bold mb-3" style="font-size: 20px;">Decrypted Digital Signature</label>
+                                <textarea class="form-control" rows="2" readonly>{{session('decrypted_digsig')}}</textarea>
+                            </div>
+                        </div>
+                        @if(session('digest') == session('decrypted_digsig'))
+                        <div class="alert alert-success" role="alert">Digest and decrypted digital signature are the same! The document is verified.</div>
+                        @else
+                        <div class="alert alert-danger" role="alert">Digest and decrypted digital signature are not the same! Something in the document has changed.</div>
+                        @endif
+                    @elseif(session('status') == 'failed')
+                    <div class="alert alert-danger" role="alert">{{session('message')}}</div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    document.getElementById('submitButton1').addEventListener('click', function () {
+    document.getElementById('submitButton1').addEventListener('click', function() {
         var inputValue = document.getElementById('encsymkey').value;
 
         if (inputValue.trim() !== '') {
@@ -95,18 +132,18 @@ $homeController = app('App\Http\Controllers\HomeController');
                     _token: '{{ csrf_token() }}',
                     encsymkey: inputValue
                 },
-                success: function (response) {
+                success: function(response) {
                     console.log(response);
                     document.getElementById('outputTextarea').value = response.decrypted;
                 },
-                error: function (error) {
+                error: function(error) {
                     console.log(error);
                 }
             });
         }
     });
 
-    document.getElementById('submitButton2').addEventListener('click', function () {
+    document.getElementById('submitButton2').addEventListener('click', function() {
         var inputValue = document.getElementById('symkey').value;
         var realsymkey = document.getElementById('realsymkey').value;
         var hiddenDataDiv = document.getElementById('hiddendata');
@@ -115,8 +152,7 @@ $homeController = app('App\Http\Controllers\HomeController');
             if (hiddenDataDiv.classList.contains('visually-hidden')) {
                 hiddenDataDiv.classList.remove('visually-hidden');
             }
-        }
-        else {
+        } else {
             if (!hiddenDataDiv.classList.contains('visually-hidden')) {
                 hiddenDataDiv.classList.add('visually-hidden');
             }
